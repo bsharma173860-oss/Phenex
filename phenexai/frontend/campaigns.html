@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Campaigns</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.camp-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px; }
+.camp-card { background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden; }
+.camp-card:hover { border-color:var(--glass-border2);transform:translateY(-2px);box-shadow:var(--shadow-glow); }
+.camp-card::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--camp-color,var(--blue-accent)); }
+.camp-type { font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px; }
+.camp-name { font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px; }
+.camp-desc { font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5; }
+.camp-stats { display:flex;gap:16px; }
+.camp-stat { display:flex;flex-direction:column;gap:2px; }
+.camp-stat-val { font-size:16px;font-weight:800;color:var(--text); }
+.camp-stat-lbl { font-size:10px;color:var(--text-muted);font-weight:600; }
+.camp-footer { display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--glass-border); }
+.camp-status-badge { font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px; }
+.camp-sent { background:rgba(34,211,160,0.12);color:var(--success); }
+.camp-active { background:rgba(74,85,224,0.12);color:var(--blue-light); }
+.camp-draft { background:var(--glass);color:var(--text-muted);border:1px solid var(--glass-border); }
+.camp-scheduled { background:rgba(255,181,71,0.12);color:var(--warning); }
+
+/* Builder */
+.builder-wrap { background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden; }
+.builder-tabs { display:flex;border-bottom:1px solid var(--glass-border); }
+.b-tab { padding:14px 22px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;transition:all 0.2s; }
+.b-tab.active { color:var(--blue-light);border-bottom-color:var(--blue-accent); }
+.b-tab-panel { display:none;padding:22px; }
+.b-tab-panel.active { display:block;animation:fadeIn 0.3s; }
+
+/* Audience builder */
+.aud-filter { display:flex;gap:10px;align-items:center;padding:12px;background:var(--glass2);border:1px solid var(--glass-border);border-radius:10px;margin-bottom:10px; }
+.aud-filter select, .aud-filter input { background:transparent;border:none;outline:none;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px; }
+.aud-filter select option { background:var(--bg2); }
+
+/* Email preview */
+.email-preview { background:#0a0c24;border:1px solid var(--glass-border);border-radius:10px;overflow:hidden; }
+.email-preview-bar { background:rgba(255,255,255,0.04);padding:10px 14px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:10px; }
+.email-preview-body { padding:24px; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Campaigns</div><div style="font-size:13px;color:var(--text-muted);margin-top:3px">Broadcast emails, SMS & social to your contacts</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('Template library opening…','info')">📋 Templates</button>
+          <button class="btn btn-primary" onclick="openModal('newCampModal')">+ New Campaign</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid-4 mb-24 anim-up d1">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--blue-glow)"></div><div class="stat-icon">📣</div><div class="stat-value">12</div><div class="stat-label">Active Campaigns</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(34,211,160,0.1)"></div><div class="stat-icon">📧</div><div class="stat-value">47.2%</div><div class="stat-label">Avg Open Rate</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(255,181,71,0.1)"></div><div class="stat-icon">👆</div><div class="stat-value">18.4%</div><div class="stat-label">Avg Click Rate</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(34,211,160,0.1)"></div><div class="stat-icon">💰</div><div class="stat-value">$12.4K</div><div class="stat-label">Revenue Attributed</div></div>
+      </div>
+
+      <!-- Campaign cards -->
+      <div class="camp-grid anim-up d2">
+        <div class="camp-card" style="--camp-color:var(--blue-bright)" onclick="showToast('Opening campaign…','info')">
+          <div class="camp-type">📧 Email Campaign</div>
+          <div class="camp-name">March Newsletter</div>
+          <div class="camp-desc">Monthly product update sent to all active contacts</div>
+          <div class="camp-stats">
+            <div class="camp-stat"><div class="camp-stat-val">1,248</div><div class="camp-stat-lbl">Sent</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--success)">51%</div><div class="camp-stat-lbl">Opened</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--blue-light)">22%</div><div class="camp-stat-lbl">Clicked</div></div>
+          </div>
+          <div class="camp-footer"><span class="camp-status-badge camp-sent">✓ Sent</span><span style="font-size:11px;color:var(--text-muted)">Mar 1</span></div>
+        </div>
+        <div class="camp-card" style="--camp-color:var(--success)" onclick="showToast('Opening campaign…','info')">
+          <div class="camp-type">💬 SMS Blast</div>
+          <div class="camp-name">Flash Offer — 20% Off</div>
+          <div class="camp-desc">Limited-time offer sent to warm leads this week</div>
+          <div class="camp-stats">
+            <div class="camp-stat"><div class="camp-stat-val">342</div><div class="camp-stat-lbl">Sent</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--success)">78%</div><div class="camp-stat-lbl">Opened</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--blue-light)">34%</div><div class="camp-stat-lbl">Replied</div></div>
+          </div>
+          <div class="camp-footer"><span class="camp-status-badge camp-active">● Running</span><span style="font-size:11px;color:var(--text-muted)">Mar 15–17</span></div>
+        </div>
+        <div class="camp-card" style="--camp-color:var(--warning)" onclick="showToast('Opening campaign…','info')">
+          <div class="camp-type">📣 LinkedIn Sequence</div>
+          <div class="camp-name">Cold Outreach — Q2</div>
+          <div class="camp-desc">5-touch LinkedIn sequence for new prospects</div>
+          <div class="camp-stats">
+            <div class="camp-stat"><div class="camp-stat-val">0</div><div class="camp-stat-lbl">Sent</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--text-muted)">—</div><div class="camp-stat-lbl">Opened</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--warning)">180</div><div class="camp-stat-lbl">Queued</div></div>
+          </div>
+          <div class="camp-footer"><span class="camp-status-badge camp-scheduled">📅 Mar 20</span><span style="font-size:11px;color:var(--text-muted)">Scheduled</span></div>
+        </div>
+        <div class="camp-card" style="--camp-color:var(--purple)" onclick="showToast('Opening campaign…','info')">
+          <div class="camp-type">📧 Email Drip</div>
+          <div class="camp-name">Lead Nurture — 7 Day</div>
+          <div class="camp-desc">Automated 7-email nurture for new signups</div>
+          <div class="camp-stats">
+            <div class="camp-stat"><div class="camp-stat-val">87</div><div class="camp-stat-lbl">Active</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--success)">44%</div><div class="camp-stat-lbl">Avg Open</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--blue-light)">12%</div><div class="camp-stat-lbl">Converted</div></div>
+          </div>
+          <div class="camp-footer"><span class="camp-status-badge camp-active">● Running</span><span style="font-size:11px;color:var(--text-muted)">Always-on</span></div>
+        </div>
+        <div class="camp-card" style="--camp-color:var(--pink)" onclick="showToast('Opening campaign…','info')">
+          <div class="camp-type">📱 WhatsApp Broadcast</div>
+          <div class="camp-name">VIP Client Update</div>
+          <div class="camp-desc">Personal message to top 20 clients</div>
+          <div class="camp-stats">
+            <div class="camp-stat"><div class="camp-stat-val">20</div><div class="camp-stat-lbl">Sent</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--success)">95%</div><div class="camp-stat-lbl">Read</div></div>
+            <div class="camp-stat"><div class="camp-stat-val" style="color:var(--blue-light)">60%</div><div class="camp-stat-lbl">Replied</div></div>
+          </div>
+          <div class="camp-footer"><span class="camp-status-badge camp-sent">✓ Sent</span><span style="font-size:11px;color:var(--text-muted)">Mar 12</span></div>
+        </div>
+        <div class="camp-card" style="--camp-color:var(--text-muted);opacity:0.7" onclick="openModal('newCampModal')">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:150px;gap:10px">
+            <div style="font-size:32px">✨</div>
+            <div style="font-size:14px;font-weight:700;color:var(--blue-light)">AI Create Campaign</div>
+            <div style="font-size:12px;color:var(--text-muted);text-align:center">Describe your goal and AI builds the campaign</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campaign Builder -->
+      <div class="builder-wrap anim-up d4">
+        <div style="padding:16px 22px;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">Campaign Builder — March Newsletter</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Saved as draft!','info')">💾 Save Draft</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Campaign launched! 🚀','success')">🚀 Launch</button>
+          </div>
+        </div>
+        <div class="builder-tabs">
+          <div class="b-tab active" onclick="switchTab(this,'tab-audience')">👥 Audience</div>
+          <div class="b-tab" onclick="switchTab(this,'tab-content')">📝 Content</div>
+          <div class="b-tab" onclick="switchTab(this,'tab-schedule')">📅 Schedule</div>
+          <div class="b-tab" onclick="switchTab(this,'tab-review')">✅ Review</div>
+        </div>
+
+        <!-- Audience tab -->
+        <div class="b-tab-panel active" id="tab-audience">
+          <div style="display:flex;gap:20px">
+            <div style="flex:1">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px;color:var(--text)">Filter your audience</div>
+              <div class="aud-filter"><span style="font-size:12px;color:var(--text-muted);width:60px">Status</span><select><option>is</option><option>is not</option></select><select><option>Hot</option><option>Warm</option><option>Cold</option><option>All</option></select><button class="btn btn-ghost btn-sm btn-icon" onclick="this.closest('.aud-filter').remove()">✕</button></div>
+              <div class="aud-filter"><span style="font-size:12px;color:var(--text-muted);width:60px">Source</span><select><option>is</option></select><select><option>LinkedIn</option><option>Website</option><option>Referral</option></select><button class="btn btn-ghost btn-sm btn-icon" onclick="this.closest('.aud-filter').remove()">✕</button></div>
+              <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addFilter()">+ Add Filter</button>
+            </div>
+            <div style="width:200px;background:linear-gradient(135deg,rgba(74,85,224,0.1),rgba(155,109,255,0.06));border:1px solid rgba(74,85,224,0.2);border-radius:12px;padding:18px;text-align:center">
+              <div style="font-size:32px;font-weight:800;color:var(--blue-light)">847</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px">contacts match</div>
+              <div style="font-size:11px;color:var(--success);margin-top:8px;font-weight:700">✓ Ready to send</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content tab -->
+        <div class="b-tab-panel" id="tab-content">
+          <div class="grid-2">
+            <div>
+              <div class="field-group"><label class="field-label">Subject Line</label><input class="field-input" value="🚀 March Update — What's New at PhenexAi"></div>
+              <div class="field-group"><label class="field-label">Preview Text</label><input class="field-input" value="This month: AI Agent upgrades, new features, and exclusive offer inside…"></div>
+              <div class="field-group"><label class="field-label">From Name</label><input class="field-input" value="John from PhenexAi"></div>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('AI writing email content…','success')">✨ AI Write Content</button>
+            </div>
+            <div class="email-preview">
+              <div class="email-preview-bar">📧 Email Preview</div>
+              <div class="email-preview-body">
+                <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:10px">🚀 What's New This March</div>
+                <div style="font-size:13px;color:var(--text-dim);line-height:1.7">Hi [First Name],<br><br>This month we've been working hard on new AI features just for you. Here's what's new…<br><br><strong style="color:var(--blue-light)">→ AI Agent now handles calls</strong><br><strong style="color:var(--blue-light)">→ Workflow builder upgraded</strong><br><strong style="color:var(--blue-light)">→ Stripe payments integration</strong></div>
+                <button class="btn btn-primary" style="margin-top:16px;font-size:12px;padding:8px 20px" onclick="showToast('Link clicked!','info')">See What\'s New →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Schedule tab -->
+        <div class="b-tab-panel" id="tab-schedule">
+          <div class="grid-2">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">Send Timing</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                <div style="display:flex;gap:10px;align-items:center;padding:14px;background:linear-gradient(135deg,rgba(74,85,224,0.1),transparent);border:1px solid rgba(74,85,224,0.3);border-radius:10px;cursor:pointer" id="sendNowOpt">
+                  <input type="radio" name="sendTime" id="r1" checked> <label for="r1" style="font-size:13.5px;font-weight:600;cursor:pointer">Send Now</label>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer">
+                  <input type="radio" name="sendTime" id="r2"> <label for="r2" style="font-size:13.5px;font-weight:600;cursor:pointer">Schedule for Later</label>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer" onclick="showToast('AI will pick the optimal send time based on your audience\'s history!','info')">
+                  <input type="radio" name="sendTime" id="r3"> <label for="r3" style="font-size:13.5px;font-weight:600;cursor:pointer">✨ AI Optimal Time</label>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div class="field-group"><label class="field-label">Date</label><input class="field-input" type="date" value="2026-03-20"></div>
+                <div class="field-group"><label class="field-label">Time</label><input class="field-input" type="time" value="10:00"></div>
+              </div>
+              <div class="field-group"><label class="field-label">Timezone</label><select class="field-input"><option>America/New_York (EST)</option><option>America/Los_Angeles (PST)</option><option>UTC</option></select></div>
+            </div>
+            <div class="glass-card" style="background:rgba(74,85,224,0.05)">
+              <div class="card-title" style="margin-bottom:14px">📊 AI Sending Insights</div>
+              <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Best day</span><span style="font-weight:700;color:var(--success)">Tuesday</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Best time</span><span style="font-weight:700;color:var(--success)">9–11 AM EST</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Predicted open rate</span><span style="font-weight:700;color:var(--blue-light)">49.2%</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Predicted clicks</span><span style="font-weight:700">~165</span></div>
+                <div style="margin-top:8px;padding:10px;background:rgba(34,211,160,0.08);border:1px solid rgba(34,211,160,0.2);border-radius:8px;font-size:12px;color:var(--success)">✅ Optimal window: Tuesday Mar 18, 10:00 AM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review tab -->
+        <div class="b-tab-panel" id="tab-review">
+          <div class="grid-2">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">Campaign Summary</div>
+              <div class="ai-card" style="background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:16px">
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Campaign</span><span style="font-weight:700">March Newsletter</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Channel</span><span style="font-weight:700">Email</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Recipients</span><span style="font-weight:700;color:var(--blue-light)">847 contacts</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Send time</span><span style="font-weight:700">Mar 18, 10:00 AM</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Subject</span><span style="font-weight:700;color:var(--text-dim);font-size:11px">🚀 March Update…</span></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:16px">
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Test email sent to john@phenexai.app','info')">📧 Send Test</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">Pre-launch Checklist</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--success)">✅</span>Subject line set</div>
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--success)">✅</span>Audience filtered (847)</div>
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--success)">✅</span>Email content ready</div>
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--success)">✅</span>Send time scheduled</div>
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--success)">✅</span>Unsubscribe link included</div>
+                <div style="display:flex;gap:10px;align-items:center;font-size:13px"><span style="color:var(--warning)">⚠️</span>Test email not sent yet</div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:20px;padding:14px" onclick="showToast('🚀 Campaign launched! Sending to 847 contacts…','success')">🚀 Launch Campaign</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NEW CAMPAIGN MODAL -->
+<div class="modal-overlay" id="newCampModal" onclick="if(event.target===this)closeModal('newCampModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📣 New Campaign</div><div class="modal-close" onclick="closeModal('newCampModal')">✕</div></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">Choose Channel</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer;text-align:center" onclick="showToast('Email campaign builder opening…','info');closeModal('newCampModal')"><div style="font-size:22px">📧</div><div style="font-size:13px;font-weight:700;margin-top:6px">Email</div></div>
+        <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer;text-align:center" onclick="showToast('SMS campaign builder opening…','info');closeModal('newCampModal')"><div style="font-size:22px">💬</div><div style="font-size:13px;font-weight:700;margin-top:6px">SMS</div></div>
+        <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer;text-align:center" onclick="showToast('WhatsApp campaign opening…','info');closeModal('newCampModal')"><div style="font-size:22px">📱</div><div style="font-size:13px;font-weight:700;margin-top:6px">WhatsApp</div></div>
+        <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer;text-align:center" onclick="showToast('LinkedIn campaign opening…','info');closeModal('newCampModal')"><div style="font-size:22px">🔗</div><div style="font-size:13px;font-weight:700;margin-top:6px">LinkedIn</div></div>
+      </div>
+    </div>
+    <div style="padding:14px;background:linear-gradient(135deg,rgba(74,85,224,0.1),rgba(155,109,255,0.06));border:1px solid rgba(74,85,224,0.25);border-radius:10px;cursor:pointer;margin-bottom:14px" onclick="showToast('AI campaign builder launching…','success');closeModal('newCampModal')">
+      <div style="font-weight:700;margin-bottom:4px">✨ Let AI Build It</div>
+      <div style="font-size:12px;color:var(--text-muted)">Describe your goal — AI picks channel, writes copy, sets audience</div>
+    </div>
+    <div class="field-group"><label class="field-label">Campaign Name</label><input class="field-input" placeholder="e.g. April Spring Promotion"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showToast('Campaign created!','success');closeModal('newCampModal')">Create Campaign →</button>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('campaigns.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Campaigns', 'Email, SMS & social broadcasts');
+
+function switchTab(el, panelId) {
+  document.querySelectorAll('.b-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.b-tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+function addFilter() {
+  const wrap = document.querySelector('.b-tab-panel.active');
+  const div = document.createElement('div');
+  div.className = 'aud-filter';
+  div.innerHTML = `<span style="font-size:12px;color:var(--text-muted);width:60px">Tag</span><select><option>is</option><option>is not</option></select><input placeholder="enter value…" style="flex:1;color:var(--text);font-size:13px"><button class="btn btn-ghost btn-sm btn-icon" onclick="this.closest('.aud-filter').remove()">✕</button>`;
+  wrap.querySelector('.aud-filter').insertAdjacentElement('afterend', div);
+}
+</script>
+</body></html>

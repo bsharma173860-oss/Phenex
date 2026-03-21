@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — The AI That Runs Your Business. Not Just a CRM.</title>
+<meta name="description" content="PhenexAi replaces GoHighLevel with real AI that answers calls, books appointments, chases invoices, and closes deals — 24/7, automatically.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04050f;
+  --navy: #070818;
+  --blue: #4a55e0;
+  --bright: #6272ff;
+  --light: #8b97ff;
+  --teal: #00d4aa;
+  --purple: #9b6dff;
+  --pink: #ff6b9d;
+  --gold: #ffb547;
+  --danger: #ff5b7f;
+  --success: #22d3a0;
+  --text: #eef0ff;
+  --muted: #6670aa;
+  --glass: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ── CURSOR ── */
+.cursor{width:20px;height:20px;border:2px solid var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform 0.15s,opacity 0.3s;mix-blend-mode:screen;}
+.cursor-dot{width:6px;height:6px;background:var(--bright);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform 0.05s;}
+
+/* ── BACKGROUND ── */
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 10%,rgba(74,85,224,0.18) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 70% at 10% 80%,rgba(155,109,255,0.1) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%,rgba(0,212,170,0.04) 0%,transparent 70%),
+    linear-gradient(160deg,#04050f 0%,#07081a 100%);
+}
+.star-field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) infinite var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:var(--min,0.1)}50%{opacity:var(--max,0.8)}}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 60px;
+  background:rgba(4,5,15,0.7);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:all 0.3s;
+}
+nav.scrolled{padding:12px 60px;background:rgba(4,5,15,0.95);}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:36px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{font-size:14px;font-weight:500;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{display:flex;gap:10px;align-items:center;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;border:none;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-outline:hover{border-color:rgba(74,85,224,0.4);color:var(--text);}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--bright));color:#fff;box-shadow:0 4px 24px rgba(74,85,224,0.4);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(74,85,224,0.5);}
+.btn-lg{padding:16px 36px;font-size:16px;border-radius:14px;}
+.btn-xl{padding:18px 48px;font-size:17px;border-radius:16px;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:120px 20px 80px;position:relative;z-index:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(74,85,224,0.1);border:1px solid rgba(74,85,224,0.25);
+  border-radius:30px;padding:8px 18px;font-size:13px;font-weight:600;
+  color:var(--light);margin-bottom:28px;animation:fadeDown 0.8s ease;
+}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(44px,7vw,88px);
+  font-weight:900;line-height:1.0;
+  letter-spacing:-0.03em;
+  margin-bottom:24px;
+  animation:fadeUp 0.9s ease 0.1s both;
+}
+.hero h1 .grad{
+  background:linear-gradient(135deg,#8b97ff,#4a55e0,#00d4aa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero h1 .strike{
+  position:relative;color:var(--muted);
+}
+.hero h1 .strike::after{
+  content:'';position:absolute;left:0;right:0;top:50%;height:3px;
+  background:var(--danger);transform:rotate(-2deg);
+  animation:strikeThrough 0.6s ease 1.2s both;transform-origin:left;
+}
+@keyframes strikeThrough{from{scaleX:0;opacity:0}to{scaleX:1;opacity:1}}
+
+.hero-sub{
+  font-size:clamp(16px,2.5vw,20px);color:var(--muted);max-width:640px;margin:0 auto 40px;
+  line-height:1.7;animation:fadeUp 0.9s ease 0.3s both;
+}
+.hero-sub strong{color:var(--text);}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp 0.9s ease 0.5s both;}
+.hero-proof{
+  margin-top:48px;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;
+  font-size:13px;color:var(--muted);animation:fadeUp 0.9s ease 0.7s both;
+}
+.hero-proof span{display:flex;align-items:center;gap:6px;}
+.hero-proof strong{color:var(--text);}
+
+/* ── VS SECTION ── */
+.vs-section{padding:100px 60px;position:relative;z-index:1;}
+.section-label{font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1.1;margin-bottom:16px;}
+.section-sub{font-size:16px;color:var(--muted);max-width:560px;line-height:1.7;}
+
+.vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-top:60px;align-items:start;}
+.vs-col{border-radius:20px;overflow:hidden;}
+.vs-col.ghl{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);opacity:0.7;}
+.vs-col.phenex{background:linear-gradient(135deg,rgba(74,85,224,0.08),rgba(155,109,255,0.05));border:1px solid rgba(74,85,224,0.25);box-shadow:0 0 60px rgba(74,85,224,0.08);}
+.vs-header{padding:24px 28px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.vs-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;}
+.vs-tagline{font-size:13px;color:var(--muted);}
+.vs-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}
+.vs-badge.old{background:rgba(255,91,127,0.12);color:var(--danger);}
+.vs-badge.new{background:rgba(34,211,160,0.12);color:var(--success);}
+.vs-items{padding:20px 28px;display:flex;flex-direction:column;gap:0;}
+.vs-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.vs-item:last-child{border-bottom:none;}
+.vs-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.vs-text{font-size:13.5px;line-height:1.5;}
+.vs-text strong{color:var(--text);display:block;font-weight:600;margin-bottom:2px;}
+.vs-text span{color:var(--muted);}
+.vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px;gap:16px;}
+.vs-mid-badge{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;color:var(--muted);}
+
+/* ── FEATURES ── */
+.features-section{padding:100px 60px;position:relative;z-index:1;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px;}
+.feat-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:20px;
+  padding:28px;position:relative;overflow:hidden;transition:all 0.3s;cursor:default;
+}
+.feat-card:hover{border-color:rgba(74,85,224,0.3);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--feat-color,var(--blue));opacity:0.6;}
+.feat-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;filter:blur(40px);opacity:0.15;}
+.feat-icon{font-size:32px;margin-bottom:16px;}
+.feat-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;}
+.feat-desc{font-size:13.5px;color:var(--muted);line-height:1.7;}
+.feat-tag{display:inline-block;margin-top:14px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(74,85,224,0.1);color:var(--light);}
+
+/* ── DEMO SECTION ── */
+.demo-section{padding:100px 60px;position:relative;z-index:1;}
+.demo-wrap{
+  background:linear-gradient(135deg,rgba(74,85,224,0.06),rgba(155,109,255,0.03));
+  border:1px solid rgba(74,85,224,0.2);border-radius:28px;
+  padding:60px;margin-top:60px;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+.demo-chat{
+  background:#07081a;border:1px solid rgba(74,85,224,0.2);
+  border-radius:16px;overflow:hidden;
+}
+.demo-chat-top{
+  padding:12px 16px;background:rgba(74,85,224,0.08);
+  border-bottom:1px solid rgba(74,85,224,0.15);
+  display:flex;align-items:center;gap:10px;
+}
+.demo-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;}
+.demo-msgs{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:260px;}
+.dm{display:flex;gap:8px;align-items:flex-start;}
+.dm.u{flex-direction:row-reverse;}
+.dm-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.dm-av.ai{background:linear-gradient(135deg,var(--blue),var(--purple));}
+.dm-av.u{background:rgba(255,255,255,0.08);font-size:14px;}
+.dm-bbl{padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.5;max-width:80%;}
+.dm.ai .dm-bbl{background:rgba(74,85,224,0.12);border:1px solid rgba(74,85,224,0.2);border-radius:3px 12px 12px 12px;}
+.dm.u .dm-bbl{background:linear-gradient(135deg,var(--blue),var(--bright));color:#fff;border-radius:12px 3px 12px 12px;}
+.demo-inp{display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(74,85,224,0.15);}
+.demo-inp input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;}
+.demo-inp input:focus{border-color:var(--blue);}
+.demo-inp input::placeholder{color:var(--muted);}
+.demo-send{background:linear-gradient(135deg,var(--blue),var(--bright));border:none;border-radius:8px;padding:8px 14px;cursor:pointer;color:#fff;font-size:13px;}
+.demo-right h3{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;margin-bottom:16px;line-height:1.2;}
+.demo-list{display:flex;flex-direction:column;gap:12px;margin-top:24px;}
+.demo-list-item{display:flex;gap:12px;align-items:flex-start;font-size:14px;}
+.demo-list-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+
+/* ── PRICING ── */
+.pricing-section{padding:100px 60px;position:relative;z-index:1;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px;max-width:960px;margin-left:auto;margin-right:auto;}
+.price-card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:24px;padding:32px;position:relative;overflow:hidden;
+  transition:all 0.3s;
+}
+.price-card:hover{transform:translateY(-6px);}
+.price-card.featured{
+  background:linear-gradient(135deg,rgba(74,85,224,0.12),rgba(155,109,255,0.06));
+  border-color:rgba(74,85,224,0.35);
+  box-shadow:0 0 60px rgba(74,85,224,0.12);
+}
+.price-badge{position:absolute;top:20px;right:20px;background:linear-gradient(135deg,var(--blue),var(--bright));color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.price-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px;}
+.price-desc{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.price-amount{display:flex;align-items:baseline;gap:4px;margin-bottom:4px;}
+.price-dollar{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--muted);margin-top:4px;}
+.price-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:900;line-height:1;}
+.price-period{font-size:13px;color:var(--muted);}
+.price-save{font-size:11px;color:var(--success);font-weight:700;margin-bottom:24px;}
+.price-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.price-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.pf{display:flex;gap:10px;align-items:center;font-size:13.5px;}
+.pf-check{color:var(--success);font-size:14px;flex-shrink:0;}
+.pf-x{color:var(--muted);font-size:14px;flex-shrink:0;opacity:0.4;}
+
+/* ── GHL COMPARE TABLE ── */
+.compare-section{padding:100px 60px;position:relative;z-index:1;}
+.compare-table{width:100%;border-collapse:collapse;margin-top:48px;}
+.compare-table th{padding:16px 20px;text-align:left;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.compare-table th.phenex-col{color:var(--light);background:rgba(74,85,224,0.06);}
+.compare-table td{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:14px;vertical-align:middle;}
+.compare-table td.phenex-col{background:rgba(74,85,224,0.04);}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02);}
+.compare-table tr:hover td.phenex-col{background:rgba(74,85,224,0.08);}
+.yes{color:var(--success);font-weight:700;}
+.no{color:var(--muted);opacity:0.5;}
+.better{color:var(--success);font-weight:700;}
+.equal{color:var(--muted);}
+
+/* ── SOCIAL PROOF ── */
+.proof-section{padding:80px 60px;position:relative;z-index:1;}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;}
+.proof-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:28px;transition:all 0.3s;}
+.proof-card:hover{border-color:rgba(74,85,224,0.25);transform:translateY(-3px);}
+.proof-stars{font-size:16px;margin-bottom:14px;}
+.proof-text{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;font-style:italic;}
+.proof-author{display:flex;align-items:center;gap:12px;}
+.proof-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;}
+.proof-name{font-size:14px;font-weight:600;}
+.proof-role{font-size:12px;color:var(--muted);}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  padding:120px 60px;position:relative;z-index:1;text-align:center;
+}
+.cta-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:300px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(74,85,224,0.15),transparent 70%);
+  pointer-events:none;
+}
+.cta-section h2{font-family:'Syne',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:900;line-height:1.1;margin-bottom:20px;}
+.cta-section p{font-size:18px;color:var(--muted);max-width:560px;margin:0 auto 40px;line-height:1.7;}
+.cta-note{font-size:13px;color:var(--muted);margin-top:16px;}
+
+/* ── FOOTER ── */
+footer{padding:60px;border-top:1px solid var(--border);position:relative;z-index:1;}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px;}
+.footer-links{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+.footer-col h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:0.05em;}
+.footer-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:10px;transition:color 0.2s;}
+.footer-col a:hover{color:var(--text);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:32px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);}
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal.d1{transition-delay:0.1s;}.reveal.d2{transition-delay:0.2s;}.reveal.d3{transition-delay:0.3s;}
+
+/* ── COUNTER ── */
+.counter-section{padding:60px;background:linear-gradient(135deg,rgba(74,85,224,0.06),rgba(155,109,255,0.03));border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;z-index:1;}
+.counter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center;}
+.counter-item{padding:20px;border-right:1px solid var(--border);}
+.counter-item:last-child{border-right:none;}
+.counter-num{font-family:'Syne',sans-serif;font-size:42px;font-weight:900;background:linear-gradient(135deg,var(--light),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.counter-lbl{font-size:13px;color:var(--muted);margin-top:4px;}
+
+/* ── TICKER ── */
+.ticker-wrap{overflow:hidden;padding:16px 0;background:rgba(74,85,224,0.06);border-top:1px solid rgba(74,85,224,0.15);border-bottom:1px solid rgba(74,85,224,0.15);position:relative;z-index:1;}
+.ticker{display:flex;gap:0;animation:ticker 25s linear infinite;width:max-content;}
+.ticker-item{white-space:nowrap;padding:0 32px;font-size:13px;font-weight:600;color:var(--light);display:flex;align-items:center;gap:8px;}
+.ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- Background -->
+<div class="bg-mesh"></div>
+<div class="star-field" id="stars"></div>
+
+<!-- Live ticker -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <div class="ticker-item"><div class="ticker-dot"></div>🤖 AI booked 14 appointments today</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>💰 $84,300 revenue tracked this month</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>📞 47 inbound calls handled by AI</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>⚡ Sub-account created in 1m 47s</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>🔥 342 leads qualified automatically</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>📧 2,847 emails sent this week</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>🤖 AI booked 14 appointments today</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>💰 $84,300 revenue tracked this month</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>📞 47 inbound calls handled by AI</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>⚡ Sub-account created in 1m 47s</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>🔥 342 leads qualified automatically</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>📧 2,847 emails sent this week</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">
+    <img src="logo.png" alt="PhenexAi">
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#vs-ghl">vs GHL</a>
+    <a href="#demo">Demo</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-cta">
+    <a href="login.html" class="btn btn-outline">Sign In</a>
+    <a href="login.html" class="btn btn-primary">Start Free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Now Live · Powered by Claude AI · Built for Agencies
+    </div>
+    <h1>
+      The AI That<br>
+      <span class="grad">Runs Your Business.</span><br>
+      Not Just a <span class="strike">CRM</span>
+    </h1>
+    <p class="hero-sub">
+      PhenexAi replaces GoHighLevel with <strong>real AI</strong> that answers calls, books appointments, replies to leads, chases invoices, and closes deals — <strong>24/7, automatically.</strong>
+    </p>
+    <div class="hero-ctas">
+      <a href="login.html" class="btn btn-primary btn-xl">🚀 Launch Free — 2 min setup</a>
+      <a href="#demo" class="btn btn-outline btn-lg">▶ See it in action</a>
+    </div>
+    <div class="hero-proof">
+      <span>✅ <strong>No credit card</strong> required</span>
+      <span>⚡ <strong>Setup in 2 minutes</strong> with AI</span>
+      <span>🤖 <strong>Claude AI</strong> powered</span>
+      <span>🔒 <strong>White-label</strong> ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<div class="counter-section reveal">
+  <div class="counter-grid">
+    <div class="counter-item">
+      <div class="counter-num" id="c1">0</div>
+      <div class="counter-lbl">AI Actions Per Day</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="c2">0</div>
+      <div class="counter-lbl">Calls Handled by AI</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="c3">0</div>
+      <div class="counter-lbl">Appointments Booked</div>
+    </div>
+    <div class="counter-item">
+      <div class="counter-num" id="c4">0</div>
+      <div class="counter-lbl">Hours Saved This Month</div>
+    </div>
+  </div>
+</div>
+
+<!-- VS GHL -->
+<section class="vs-section" id="vs-ghl">
+  <div class="section-label">PhenexAi vs GoHighLevel</div>
+  <div class="section-title">Why agencies are<br>switching to PhenexAi</div>
+  <div class="section-sub">GHL is a tool. PhenexAi is an employee that never sleeps, never calls in sick, and works across every client simultaneously.</div>
+
+  <div class="vs-grid reveal">
+    <div class="vs-col ghl">
+      <div class="vs-header">
+        <div class="vs-name" style="color:var(--muted)">GoHighLevel</div>
+        <div class="vs-tagline">Traditional CRM platform</div>
+        <div class="vs-badge old">❌ Old Way</div>
+      </div>
+      <div class="vs-items">
+        <div class="vs-item"><div class="vs-icon">😫</div><div class="vs-text"><strong>You do everything manually</strong><span>Reply to leads, book calls, send invoices yourself</span></div></div>
+        <div class="vs-item"><div class="vs-icon">💸</div><div class="vs-text"><strong>$297–$497/month</strong><span>Expensive for what it actually automates</span></div></div>
+        <div class="vs-item"><div class="vs-icon">📱</div><div class="vs-text"><strong>Basic AI chatbot</strong><span>Scripted, robotic, can't think or adapt</span></div></div>
+        <div class="vs-item"><div class="vs-icon">⏳</div><div class="vs-text"><strong>3–5 days to set up</strong><span>Manual pipelines, funnels, workflows</span></div></div>
+        <div class="vs-item"><div class="vs-icon">🧱</div><div class="vs-text"><strong>Rigid workflows</strong><span>If/then logic, breaks on edge cases</span></div></div>
+        <div class="vs-item"><div class="vs-icon">📞</div><div class="vs-text"><strong>Calls need humans</strong><span>AI can't actually handle real conversations</span></div></div>
+      </div>
+    </div>
+
+    <div class="vs-mid">
+      <div class="vs-mid-badge">VS</div>
+      <div style="width:2px;flex:1;background:linear-gradient(180deg,transparent,var(--blue),transparent);min-height:200px;"></div>
+    </div>
+
+    <div class="vs-col phenex">
+      <div class="vs-header">
+        <img src="logo.png" style="height:30px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);margin-bottom:6px;">
+        <div class="vs-tagline">AI-Powered Business Automation</div>
+        <div class="vs-badge new">✅ The New Way</div>
+      </div>
+      <div class="vs-items">
+        <div class="vs-item"><div class="vs-icon">🤖</div><div class="vs-text"><strong style="color:var(--success)">Claude AI handles EVERYTHING</strong><span>Replies, books, invoices, qualifies — all automatic</span></div></div>
+        <div class="vs-item"><div class="vs-icon">💰</div><div class="vs-text"><strong style="color:var(--success)">Starting at $97/month</strong><span>Pay per use API — scales with you</span></div></div>
+        <div class="vs-item"><div class="vs-icon">🧠</div><div class="vs-text"><strong style="color:var(--success)">Real Claude AI — thinks & adapts</strong><span>Understands context, handles anything thrown at it</span></div></div>
+        <div class="vs-item"><div class="vs-icon">⚡</div><div class="vs-text"><strong style="color:var(--success)">Live in 2 minutes</strong><span>AI scrapes website, builds entire account automatically</span></div></div>
+        <div class="vs-item"><div class="vs-icon">🔮</div><div class="vs-text"><strong style="color:var(--success)">Natural language workflows</strong><span>Just tell AI what you want — it figures it out</span></div></div>
+        <div class="vs-item"><div class="vs-icon">📞</div><div class="vs-text"><strong style="color:var(--success)">AI handles real phone calls</strong><span>Qualifies, books, follows up — like a real person</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-label">Everything You Need</div>
+  <div class="section-title">One platform.<br>Your entire business.</div>
+
+  <div class="features-grid">
+    <div class="feat-card reveal d1" style="--feat-color:#6272ff">
+      <div class="feat-glow" style="background:#6272ff"></div>
+      <div class="feat-icon">🧠</div>
+      <div class="feat-title">AI Command Center</div>
+      <div class="feat-desc">Claude AI controls all your client accounts simultaneously. One command runs actions across every business — book calls, send emails, qualify leads, chase invoices.</div>
+      <div class="feat-tag">Claude Powered</div>
+    </div>
+    <div class="feat-card reveal d2" style="--feat-color:#22d3a0">
+      <div class="feat-glow" style="background:#22d3a0"></div>
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">2-Minute Sub-Account Creation</div>
+      <div class="feat-desc">Enter a business name + website. AI scrapes everything, trains itself, sets up CRM, pipeline, workflows, and AI agent — all in under 2 minutes.</div>
+      <div class="feat-tag">AI Auto-Setup</div>
+    </div>
+    <div class="feat-card reveal d3" style="--feat-color:#ffb547">
+      <div class="feat-glow" style="background:#ffb547"></div>
+      <div class="feat-icon">📞</div>
+      <div class="feat-title">Real AI Phone Agent</div>
+      <div class="feat-desc">AI answers every inbound call, qualifies the lead, books appointments, and adds them to the CRM — all without human intervention. 24/7.</div>
+      <div class="feat-tag">Voice AI</div>
+    </div>
+    <div class="feat-card reveal d1" style="--feat-color:#9b6dff">
+      <div class="feat-glow" style="background:#9b6dff"></div>
+      <div class="feat-icon">💬</div>
+      <div class="feat-title">Unified Smart Inbox</div>
+      <div class="feat-desc">SMS, Email, WhatsApp, and calls — all in one thread per contact. AI replies instantly, escalates to human when needed.</div>
+      <div class="feat-tag">All Channels</div>
+    </div>
+    <div class="feat-card reveal d2" style="--feat-color:#ff6b9d">
+      <div class="feat-glow" style="background:#ff6b9d"></div>
+      <div class="feat-icon">🏢</div>
+      <div class="feat-title">Agency + White Label</div>
+      <div class="feat-desc">Manage unlimited client sub-accounts. Brand it as your own software with custom domain, logo, and colors. Clients see your brand, not PhenexAi.</div>
+      <div class="feat-tag">White Label</div>
+    </div>
+    <div class="feat-card reveal d3" style="--feat-color:#00d4aa">
+      <div class="feat-glow" style="background:#00d4aa"></div>
+      <div class="feat-icon">💳</div>
+      <div class="feat-title">AI Payments & Invoicing</div>
+      <div class="feat-desc">Stripe-powered invoices sent automatically. AI chases overdue payments via SMS and email. Rebilling clients for AI usage is built-in.</div>
+      <div class="feat-tag">Stripe Connected</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section" id="demo">
+  <div class="section-label">See It Live</div>
+  <div class="section-title">Talk to the AI.<br>Watch it work.</div>
+
+  <div class="demo-wrap reveal">
+    <div>
+      <div class="demo-chat">
+        <div class="demo-chat-top">
+          <div class="demo-av">🧠</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">PhenexAi Brain</div>
+            <div style="font-size:11px;color:var(--muted)">● Live · Claude Powered</div>
+          </div>
+          <div style="margin-left:auto;font-size:11px;font-weight:700;color:var(--success)">All 6 accounts</div>
+        </div>
+        <div class="demo-msgs" id="demoMsgs">
+          <div class="dm ai">
+            <div class="dm-av ai">🧠</div>
+            <div class="dm-bbl">Hi! I'm managing your agency right now. Tell me what to do and I'll handle it across all your accounts. 🚀</div>
+          </div>
+        </div>
+        <div class="demo-inp">
+          <input id="demoInput" placeholder="e.g. Book calls for all hot leads…" onkeydown="if(event.key==='Enter')demoSend()">
+          <button class="demo-send" onclick="demoSend()">➤</button>
+        </div>
+      </div>
+      <!-- Quick demo commands -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+        <div onclick="demoQuick('Find all hot leads today')" style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(74,85,224,0.3);background:rgba(74,85,224,0.08);color:var(--light);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">🔥 Find hot leads</div>
+        <div onclick="demoQuick('Book appointments for all pending leads')" style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(74,85,224,0.3);background:rgba(74,85,224,0.08);color:var(--light);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">📅 Book all calls</div>
+        <div onclick="demoQuick('Chase all overdue invoices now')" style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(74,85,224,0.3);background:rgba(74,85,224,0.08);color:var(--light);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">💳 Chase invoices</div>
+        <div onclick="demoQuick('Show todays revenue across all accounts')" style="padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(74,85,224,0.3);background:rgba(74,85,224,0.08);color:var(--light);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">💰 Today's revenue</div>
+      </div>
+    </div>
+
+    <div class="demo-right">
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px">What just happened?</div>
+      <h3>You typed one sentence.<br><span style="background:linear-gradient(135deg,var(--light),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AI did everything else.</span></h3>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px">No clicking through menus. No manual workflows. No hiring staff. Just tell PhenexAi what you need and Claude handles it instantly across every client account.</p>
+      <div class="demo-list">
+        <div class="demo-list-item">
+          <div class="demo-list-icon" style="background:rgba(74,85,224,0.1)">🔍</div>
+          <div><strong style="display:block;margin-bottom:2px;font-size:14px">Searches across all accounts</strong><span style="font-size:13px;color:var(--muted)">Finds relevant contacts, deals & data instantly</span></div>
+        </div>
+        <div class="demo-list-item">
+          <div class="demo-list-icon" style="background:rgba(34,211,160,0.1)">⚡</div>
+          <div><strong style="display:block;margin-bottom:2px;font-size:14px">Takes real actions</strong><span style="font-size:13px;color:var(--muted)">Books, emails, calls, invoices — actually done</span></div>
+        </div>
+        <div class="demo-list-item">
+          <div class="demo-list-icon" style="background:rgba(155,109,255,0.1)">📊</div>
+          <div><strong style="display:block;margin-bottom:2px;font-size:14px">Reports back clearly</strong><span style="font-size:13px;color:var(--muted)">Shows exactly what was done and results</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="compare-section">
+  <div style="text-align:center">
+    <div class="section-label" style="text-align:center">Full Comparison</div>
+    <div class="section-title" style="text-align:center">PhenexAi vs GoHighLevel</div>
+  </div>
+  <table class="compare-table reveal">
+    <thead>
+      <tr>
+        <th style="width:35%">Feature</th>
+        <th>GoHighLevel</th>
+        <th class="phenex-col">PhenexAi 🚀</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>AI that actually thinks</strong></td><td class="no">❌ Basic scripted bot</td><td class="phenex-col better">✅ Claude AI — real intelligence</td></tr>
+      <tr><td><strong>Setup time</strong></td><td class="no">⏳ 3–5 days manual</td><td class="phenex-col better">✅ 2 minutes with AI auto-setup</td></tr>
+      <tr><td><strong>Handles phone calls</strong></td><td class="no">❌ Humans needed</td><td class="phenex-col better">✅ AI answers & qualifies all calls</td></tr>
+      <tr><td><strong>Natural language commands</strong></td><td class="no">❌ Click through menus</td><td class="phenex-col better">✅ Just type what you want</td></tr>
+      <tr><td><strong>Agency dashboard</strong></td><td class="equal">✅ Yes</td><td class="phenex-col better">✅ With live AI feed & controls</td></tr>
+      <tr><td><strong>White label</strong></td><td class="equal">✅ Yes (expensive add-on)</td><td class="phenex-col better">✅ Built-in, all plans</td></tr>
+      <tr><td><strong>CRM</strong></td><td class="equal">✅ Yes</td><td class="phenex-col better">✅ AI-scored & auto-updated</td></tr>
+      <tr><td><strong>Pipelines</strong></td><td class="equal">✅ Yes</td><td class="phenex-col better">✅ AI moves deals automatically</td></tr>
+      <tr><td><strong>Email & SMS campaigns</strong></td><td class="equal">✅ Yes</td><td class="phenex-col better">✅ AI writes & optimizes them</td></tr>
+      <tr><td><strong>Multi-account control</strong></td><td class="no">⚠️ Switch accounts manually</td><td class="phenex-col better">✅ Control all from one AI chat</td></tr>
+      <tr><td><strong>Starting price</strong></td><td class="no">💸 $297/month</td><td class="phenex-col better">✅ $97/month</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof-section">
+  <div style="text-align:center;margin-bottom:0">
+    <div class="section-label" style="text-align:center">Early Users</div>
+    <div class="section-title" style="text-align:center;font-size:clamp(28px,4vw,42px)">Agencies already switching</div>
+  </div>
+  <div class="proof-grid" style="margin-top:48px">
+    <div class="proof-card reveal d1">
+      <div class="proof-stars">⭐⭐⭐⭐⭐</div>
+      <div class="proof-text">"We switched from GHL 3 weeks ago. The AI booked 23 appointments in the first week without us touching anything. Our close rate went from 18% to 31%."</div>
+      <div class="proof-author">
+        <div class="proof-av" style="background:linear-gradient(135deg,#4a55e0,#6272ff)">SM</div>
+        <div><div class="proof-name">Sarah Mitchell</div><div class="proof-role">Agency Owner · TechCorp Inc.</div></div>
+      </div>
+    </div>
+    <div class="proof-card reveal d2">
+      <div class="proof-stars">⭐⭐⭐⭐⭐</div>
+      <div class="proof-text">"I manage 8 client accounts. Before PhenexAi I had 3 staff members doing follow-ups. Now the AI handles all 8 accounts and I saved $12K/month in salaries."</div>
+      <div class="proof-author">
+        <div class="proof-av" style="background:linear-gradient(135deg,#22d3a0,#1aab80)">AK</div>
+        <div><div class="proof-name">Ahmed Khan</div><div class="proof-role">Marketing Director · Nova Agency</div></div>
+      </div>
+    </div>
+    <div class="proof-card reveal d3">
+      <div class="proof-stars">⭐⭐⭐⭐⭐</div>
+      <div class="proof-text">"The 2-minute sub-account setup is insane. I onboarded a new client during a sales call — AI built the entire account while we were still talking. Client was blown away."</div>
+      <div class="proof-author">
+        <div class="proof-av" style="background:linear-gradient(135deg,#9b6dff,#6b4fcc)">LR</div>
+        <div><div class="proof-name">Lisa Rodriguez</div><div class="proof-role">CEO · Bloom Studio</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div style="text-align:center">
+    <div class="section-label" style="text-align:center">Simple Pricing</div>
+    <div class="section-title" style="text-align:center">Start free. Scale as you grow.</div>
+    <div style="font-size:16px;color:var(--muted);margin-top:12px">No contracts. No hidden fees. Cancel anytime.</div>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card reveal d1">
+      <div class="price-name">Starter</div>
+      <div class="price-desc">For solo operators & freelancers</div>
+      <div class="price-amount"><span class="price-dollar">$</span><span class="price-num">97</span><span class="price-period">/mo</span></div>
+      <div class="price-save">Save $600/yr vs GHL</div>
+      <hr class="price-divider">
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>3 Sub-accounts</div>
+        <div class="pf"><span class="pf-check">✓</span>Full CRM + Pipeline</div>
+        <div class="pf"><span class="pf-check">✓</span>AI Agent (1,000 msgs/mo)</div>
+        <div class="pf"><span class="pf-check">✓</span>SMS + Email</div>
+        <div class="pf"><span class="pf-check">✓</span>Workflows + Campaigns</div>
+        <div class="pf"><span class="pf-x">✗</span><span style="color:var(--muted)">White Label</span></div>
+        <div class="pf"><span class="pf-x">✗</span><span style="color:var(--muted)">AI Phone Calls</span></div>
+      </div>
+      <a href="login.html" class="btn btn-outline" style="width:100%;justify-content:center">Get Started</a>
+    </div>
+
+    <div class="price-card featured reveal d2">
+      <div class="price-badge">Most Popular</div>
+      <div class="price-name">Pro</div>
+      <div class="price-desc">For growing agencies</div>
+      <div class="price-amount"><span class="price-dollar">$</span><span class="price-num">197</span><span class="price-period">/mo</span></div>
+      <div class="price-save">Save $1,200/yr vs GHL Pro</div>
+      <hr class="price-divider">
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>10 Sub-accounts</div>
+        <div class="pf"><span class="pf-check">✓</span>Everything in Starter</div>
+        <div class="pf"><span class="pf-check">✓</span>AI Agent (10,000 msgs/mo)</div>
+        <div class="pf"><span class="pf-check">✓</span>AI Phone Call Handling</div>
+        <div class="pf"><span class="pf-check">✓</span>White Label Branding</div>
+        <div class="pf"><span class="pf-check">✓</span>AI Command Center</div>
+        <div class="pf"><span class="pf-check">✓</span>Priority Support</div>
+      </div>
+      <a href="login.html" class="btn btn-primary" style="width:100%;justify-content:center">Start Free Trial →</a>
+    </div>
+
+    <div class="price-card reveal d3">
+      <div class="price-name">Agency</div>
+      <div class="price-desc">For established agencies</div>
+      <div class="price-amount"><span class="price-dollar">$</span><span class="price-num">297</span><span class="price-period">/mo</span></div>
+      <div class="price-save">Same price as GHL — 10x the AI</div>
+      <hr class="price-divider">
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>Unlimited Sub-accounts</div>
+        <div class="pf"><span class="pf-check">✓</span>Everything in Pro</div>
+        <div class="pf"><span class="pf-check">✓</span>Unlimited AI messages</div>
+        <div class="pf"><span class="pf-check">✓</span>Custom Mobile App</div>
+        <div class="pf"><span class="pf-check">✓</span>Rebilling System</div>
+        <div class="pf"><span class="pf-check">✓</span>Dedicated AI training</div>
+        <div class="pf"><span class="pf-check">✓</span>SLA + Dedicated support</div>
+      </div>
+      <a href="login.html" class="btn btn-outline" style="width:100%;justify-content:center">Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="hero-badge" style="margin-bottom:24px">
+    <div class="badge-dot"></div>
+    Join agencies already using PhenexAi
+  </div>
+  <h2>Ready to let AI<br><span style="background:linear-gradient(135deg,var(--light),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">run your business?</span></h2>
+  <p>Set up your agency in 2 minutes. No credit card. No setup fees. The AI does everything.</p>
+  <a href="login.html" class="btn btn-primary btn-xl">🚀 Start Free Right Now</a>
+  <div class="cta-note">✅ Free forever plan available · 🔒 Your data is encrypted · 🤖 Powered by Claude AI</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <img src="logo.png" style="height:36px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);margin-bottom:16px;display:block;">
+      <div style="font-size:13px;color:var(--muted);max-width:240px;line-height:1.7">The AI platform that runs your entire business — not just tracks it.</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#vs-ghl">vs GoHighLevel</a>
+        <a href="frontend/agency.html">Agency Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="frontend/ai-command.html">AI Command Center</a>
+        <a href="frontend/crm.html">CRM</a>
+        <a href="frontend/pipeline.html">Pipeline</a>
+        <a href="frontend/conversations.html">Conversations</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 PhenexAi. Built with 🧠 Claude AI. All rights reserved.</span>
+    <span style="color:var(--success)">● All systems operational</span>
+  </div>
+</footer>
+
+<script>
+// ── STARS ──
+const sf = document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');s.className='star';
+  const size=Math.random()*2.5+0.5;
+  s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--min:${0.05+Math.random()*0.1};--max:${0.4+Math.random()*0.6}`;
+  sf.appendChild(s);
+}
+
+// ── CURSOR ──
+const cur=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX-10+'px';cur.style.top=e.clientY-10+'px';
+  dot.style.left=e.clientX-3+'px';dot.style.top=e.clientY-3+'px';
+});
+document.querySelectorAll('a,button,[onclick]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2)';cur.style.borderColor='var(--teal)';});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';cur.style.borderColor='var(--blue)';});
+});
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ── REVEAL ON SCROLL ──
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ── COUNTERS ──
+function animateCounter(el,target,suffix=''){
+  let current=0;const step=target/80;const interval=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=Math.floor(current).toLocaleString()+(suffix||'');
+    if(current>=target)clearInterval(interval);
+  },20);
+}
+const cObs=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting){
+    animateCounter(document.getElementById('c1'),2341);
+    animateCounter(document.getElementById('c2'),47);
+    animateCounter(document.getElementById('c3'),89);
+    animateCounter(document.getElementById('c4'),247);
+    cObs.disconnect();
+  }
+},{threshold:0.5});
+cObs.observe(document.querySelector('.counter-section'));
+
+// ── DEMO CHAT ──
+const DEMO_REPLIES = {
+  'hot': {text:'Found <strong>8 hot leads</strong> across all 6 accounts right now:', rows:[['Sarah Mitchell — TechCorp','Score 94 · $18K · Sending follow-up ✅'],['Ryan Park — BuildFast','Score 91 · $14K · Booking call ✅'],['Julia T. — Nova Agency','Score 88 · $11K · Email sent ✅'],['+ 5 more','All actioned ✅']]},
+  'book': {text:'Booking appointments across all pending leads now:', rows:[['Ahmed Khan — Nova','Thu 2pm Video · Invite sent ✅'],['Marcus Patel — TechCorp','Fri 10am Call · Invite sent ✅'],['Emma Wilson — Bloom','Mon 11am Video · Invite sent ✅']]},
+  'invoice': {text:'Chasing all overdue invoices now:', rows:[['TechCorp — $18,000','Email + SMS sent ✅'],['Nova — $7,200','Payment link re-sent ✅'],['FintechX — $4,500','Escalation email sent ✅']]},
+  'revenue': {text:'Today\'s revenue across all accounts:', rows:[['TechCorp Inc.','$8,400 · Invoice paid ✅'],['Nova Agency','$3,200 · 2 deals closed'],['Bloom Studio','$1,800 · Retainer'],['TOTAL TODAY','$13,400 💰']]},
+};
+function getReply(msg){
+  const m=msg.toLowerCase();
+  if(m.includes('hot')||m.includes('lead'))return DEMO_REPLIES.hot;
+  if(m.includes('book')||m.includes('appoint'))return DEMO_REPLIES.book;
+  if(m.includes('invoice')||m.includes('payment'))return DEMO_REPLIES.invoice;
+  if(m.includes('revenue')||m.includes('money'))return DEMO_REPLIES.revenue;
+  return {text:`On it! Running "${msg}" across all accounts now. ✅`,rows:null};
+}
+function demoSend(){
+  const inp=document.getElementById('demoInput');
+  const msgs=document.getElementById('demoMsgs');
+  const txt=inp.value.trim();if(!txt)return;
+  msgs.innerHTML+=`<div class="dm u"><div class="dm-av u">👤</div><div class="dm-bbl">${txt}</div></div>`;
+  inp.value='';msgs.scrollTop=9999;
+  setTimeout(()=>{
+    const r=getReply(txt);
+    let rowsHTML='';
+    if(r.rows){
+      rowsHTML=`<div style="background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.2);border-radius:8px;padding:10px;margin-top:8px;font-size:11.5px;">
+        ${r.rows.map(row=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="color:rgba(255,255,255,0.5)">${row[0]}</span><span style="color:#eef0ff">${row[1]}</span></div>`).join('')}
+      </div>`;
+    }
+    msgs.innerHTML+=`<div class="dm ai"><div class="dm-av ai">🧠</div><div class="dm-bbl">${r.text}${rowsHTML}</div></div>`;
+    msgs.scrollTop=9999;
+  },900);
+}
+function demoQuick(cmd){document.getElementById('demoInput').value=cmd;demoSend();}
+
+// ── STRIKE ANIMATION ──
+setTimeout(()=>{
+  const strike=document.querySelector('.strike');
+  if(strike)strike.style.setProperty('--strike','scaleX(1)');
+},1500);
+</script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — New Sub-Account</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.onboard-wrap { display:flex; min-height:100vh; align-items:stretch; }
+.onboard-left {
+  width:420px; flex-shrink:0;
+  background: rgba(7,8,26,0.9);
+  border-right: 1px solid var(--glass-border);
+  display:flex; flex-direction:column;
+  padding: 40px 36px;
+  backdrop-filter: blur(20px);
+}
+.onboard-right {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  padding: 40px;
+  position: relative;
+}
+.steps { display:flex; flex-direction:column; gap:0; margin-top:32px; flex:1; }
+.step-item {
+  display:flex; gap:14px; align-items:flex-start;
+  padding-bottom: 28px; position:relative;
+}
+.step-item:not(:last-child)::before {
+  content:''; position:absolute;
+  left:15px; top:32px; bottom:0; width:2px;
+  background: var(--glass-border);
+}
+.step-item.done::before { background: var(--blue-accent); }
+.step-num {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; z-index:1;
+  background: var(--glass); border: 2px solid var(--glass-border);
+  color: var(--text-muted); transition:all 0.4s;
+}
+.step-item.active .step-num {
+  background: linear-gradient(135deg, var(--blue-accent), var(--blue-bright));
+  border-color: transparent; color:#fff;
+  box-shadow: 0 0 20px rgba(74,85,224,0.5);
+  animation: glow-pulse 2s infinite;
+}
+.step-item.done .step-num {
+  background: var(--success); border-color: transparent; color:#000; font-size:16px;
+}
+.step-label { font-size:13px; font-weight:600; color:var(--text-dim); padding-top:6px; }
+.step-item.active .step-label { color:var(--text); }
+.step-item.done .step-label { color:var(--text-dim); text-decoration:line-through; opacity:0.6; }
+
+/* Form panel */
+.form-panel {
+  background: var(--glass); border:1px solid var(--glass-border);
+  border-radius:20px; padding:36px;
+  width:100%; max-width:560px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.form-step { display:none; }
+.form-step.active { display:block; animation: fadeUp 0.4s ease; }
+
+.progress-bar {
+  height:4px; background:var(--glass-border);
+  border-radius:4px; margin-bottom:28px; overflow:hidden;
+}
+.progress-fill {
+  height:100%; border-radius:4px;
+  background:linear-gradient(90deg, var(--blue-accent), var(--blue-bright));
+  transition: width 0.5s ease;
+}
+
+.scrape-visual {
+  background: var(--glass); border:1px solid var(--glass-border);
+  border-radius:12px; padding:16px; margin:16px 0;
+  font-family: monospace; font-size:12px; color:var(--text-dim);
+  min-height:100px; overflow:hidden;
+}
+.scrape-line { margin:4px 0; opacity:0; animation:fadeIn 0.3s ease forwards; }
+.scrape-line.ok::before { content:'✓ '; color:var(--success); }
+.scrape-line.load::before { content:'⟳ '; color:var(--blue-light); }
+
+.ai-card {
+  background:linear-gradient(135deg, rgba(74,85,224,0.12), rgba(155,109,255,0.08));
+  border:1px solid rgba(74,85,224,0.25); border-radius:12px; padding:16px;
+  margin:14px 0;
+}
+.ai-card-label { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--blue-light); margin-bottom:8px; }
+.ai-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.ai-row:last-child { border-bottom:none; }
+.ai-row-key { color:var(--text-muted); }
+.ai-row-val { color:var(--text); font-weight:600; }
+
+.integrations-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+.integration-item {
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:10px; padding:12px 14px;
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+  transition:all 0.2s; font-size:13px; font-weight:500; color:var(--text-dim);
+}
+.integration-item:hover { border-color:var(--glass-border2); color:var(--text); }
+.integration-item.connected { border-color:rgba(34,211,160,0.3); color:var(--success); background:rgba(34,211,160,0.05); }
+.integration-item .int-icon { font-size:20px; }
+.int-status { margin-left:auto; font-size:10px; font-weight:700; }
+
+.success-screen { text-align:center; padding:20px 0; }
+.success-icon {
+  width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+  background:linear-gradient(135deg, var(--success), #1aab80);
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; box-shadow:0 0 40px rgba(34,211,160,0.4);
+  animation: glow-pulse 2s infinite;
+}
+.timer-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(34,211,160,0.1); border:1px solid rgba(34,211,160,0.25);
+  border-radius:20px; padding:6px 16px;
+  font-size:13px; font-weight:700; color:var(--success);
+  margin:12px auto;
+}
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="onboard-wrap">
+
+  <!-- Left steps panel -->
+  <div class="onboard-left">
+    <div>${'<svg viewBox="0 0 280 70" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:160px"><defs><linearGradient id="wg" x1="140" y1="0" x2="140" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9ba8ff"/><stop offset="100%" stop-color="#4a55e0"/></linearGradient><linearGradient id="tg" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c8ceff"/><stop offset="70%" stop-color="#eef0ff"/></linearGradient><linearGradient id="ag" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4a55e0"/><stop offset="100%" stop-color="#8b97ff"/></linearGradient></defs><g><path d="M140 4 L112 17 L122 15 L117 23 L130 14 L134 21 L138 8 Z" fill="url(#wg)"/><path d="M140 4 L168 17 L158 15 L163 23 L150 14 L146 21 L142 8 Z" fill="url(#wg)"/></g><text x="4" y="62" font-family="Arial Black,sans-serif" font-weight="900" font-size="38" fill="url(#tg)" letter-spacing="-0.5">phenex</text><text x="196" y="62" font-family="Arial Black,sans-serif" font-weight="900" font-size="38" fill="url(#ag)">A</text><circle cx="257" cy="36" r="9" fill="none" stroke="url(#ag)" stroke-width="2.2"/><circle cx="257" cy="36" r="3.5" fill="none" stroke="url(#ag)" stroke-width="1.8"/><line x1="266" y1="30" x2="274" y2="23" stroke="url(#ag)" stroke-width="2.2" stroke-linecap="round"/><circle cx="275.5" cy="21.5" r="3.5" fill="url(#ag)"/><line x1="257" y1="46" x2="257" y2="63" stroke="url(#ag)" stroke-width="6.5" stroke-linecap="round"/></svg>'}</div>
+    <div style="margin-top:24px">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Create Sub-Account</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Set up a complete business workspace in under 2 minutes. AI does the heavy lifting.</div>
+    </div>
+    <div class="steps" id="stepsList">
+      <div class="step-item active" id="sStep1"><div class="step-num" id="sNum1">1</div><div class="step-label">Business Info</div></div>
+      <div class="step-item" id="sStep2"><div class="step-num" id="sNum2">2</div><div class="step-label">AI Auto-Fill</div></div>
+      <div class="step-item" id="sStep3"><div class="step-num" id="sNum3">3</div><div class="step-label">Integrations</div></div>
+      <div class="step-item" id="sStep4"><div class="step-num" id="sNum4">4</div><div class="step-label">Launch</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:auto;padding-top:20px">
+      <div style="color:var(--success);font-weight:700;margin-bottom:4px">⚡ Average setup time: 1m 47s</div>
+      Powered by PhenexAi — all data is encrypted and secure.
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="onboard-right">
+    <div class="form-panel">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+      <!-- STEP 1: Business Info -->
+      <div class="form-step active" id="step1">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Tell us about the business</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Enter the name and website — AI will fill in the rest automatically.</div>
+        <div class="field-group">
+          <label class="field-label">Business Name *</label>
+          <input class="field-input" id="bizName" placeholder="e.g. Apex Marketing Agency" type="text">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Website URL</label>
+          <input class="field-input" id="bizWebsite" placeholder="https://www.example.com" type="url">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Industry</label>
+          <select class="field-input" id="bizIndustry">
+            <option value="">Select industry…</option>
+            <option>Marketing Agency</option>
+            <option>Real Estate</option>
+            <option>E-Commerce</option>
+            <option>SaaS / Tech</option>
+            <option>Healthcare</option>
+            <option>Law Firm</option>
+            <option>Consulting</option>
+            <option>Restaurant / Food</option>
+            <option>Fitness / Wellness</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Admin Phone Number *</label>
+          <input class="field-input" id="bizPhone" placeholder="+1 555 000 0000" type="tel">
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="goStep2()">Continue — AI Auto-Fill ✨</button>
+      </div>
+
+      <!-- STEP 2: AI Scraping -->
+      <div class="form-step" id="step2">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">AI is building your account ✨</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Scanning your website and setting up everything automatically…</div>
+        <div class="scrape-visual" id="scrapeLog"></div>
+        <div class="ai-card" id="aiPreview" style="display:none">
+          <div class="ai-card-label">✅ Account Preview</div>
+          <div class="ai-row"><span class="ai-row-key">Business</span><span class="ai-row-val" id="prev-biz">—</span></div>
+          <div class="ai-row"><span class="ai-row-key">Industry</span><span class="ai-row-val" id="prev-ind">—</span></div>
+          <div class="ai-row"><span class="ai-row-key">CRM Contacts</span><span class="ai-row-val">0 (ready to import)</span></div>
+          <div class="ai-row"><span class="ai-row-key">Pipeline</span><span class="ai-row-val">Default (3 stages)</span></div>
+          <div class="ai-row"><span class="ai-row-key">AI Agent</span><span class="ai-row-val" id="prev-agent">—</span></div>
+          <div class="ai-row"><span class="ai-row-key">Sub-domain</span><span class="ai-row-val" id="prev-domain">—</span></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;display:none" id="step2Next" onclick="goStep3()">Looks good — Connect Integrations →</button>
+      </div>
+
+      <!-- STEP 3: Integrations -->
+      <div class="form-step" id="step3">
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px">Connect your tools</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">Connect now or skip — you can always add later from Settings.</div>
+        <div class="integrations-grid" id="intGrid">
+          <div class="integration-item" onclick="toggleInt(this,'Google Calendar')"><span class="int-icon">📅</span>Google Calendar<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'Gmail')"><span class="int-icon">📧</span>Gmail<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'Stripe')"><span class="int-icon">💳</span>Stripe<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'Twilio SMS')"><span class="int-icon">💬</span>Twilio SMS<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'WhatsApp')"><span class="int-icon">📱</span>WhatsApp<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'LinkedIn')"><span class="int-icon">🔗</span>LinkedIn<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'Facebook')"><span class="int-icon">👍</span>Facebook<span class="int-status"></span></div>
+          <div class="integration-item" onclick="toggleInt(this,'Instagram')"><span class="int-icon">📸</span>Instagram<span class="int-status"></span></div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px" onclick="goStep4()">Launch Sub-Account 🚀</button>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center;padding:12px;margin-top:8px" onclick="goStep4()">Skip for now</button>
+      </div>
+
+      <!-- STEP 4: Success -->
+      <div class="form-step" id="step4">
+        <div class="success-screen">
+          <div class="success-icon">🚀</div>
+          <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px">Sub-Account Live!</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Your business workspace is fully set up and ready to use.</div>
+          <div class="timer-badge">⚡ Created in <span id="timerDisplay">0</span>s</div>
+          <div style="margin:20px 0;">
+            <div class="ai-card" style="text-align:left">
+              <div class="ai-card-label">🎯 What's Ready</div>
+              <div class="ai-row"><span class="ai-row-key">CRM</span><span class="ai-row-val">✅ Active</span></div>
+              <div class="ai-row"><span class="ai-row-key">AI Agent</span><span class="ai-row-val">✅ Trained & Live</span></div>
+              <div class="ai-row"><span class="ai-row-key">Pipeline</span><span class="ai-row-val">✅ 3 stages ready</span></div>
+              <div class="ai-row"><span class="ai-row-key">Calendar</span><span class="ai-row-val">✅ Booking enabled</span></div>
+              <div class="ai-row"><span class="ai-row-key">Conversations</span><span class="ai-row-val">✅ Inbox ready</span></div>
+            </div>
+          </div>
+          <a href="index.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;display:flex;margin-bottom:10px">Go to Dashboard →</a>
+          <a href="onboarding.html" class="btn btn-ghost" style="width:100%;justify-content:center;padding:12px;display:flex">Add Another Sub-Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let startTime, timerInterval;
+const SCRAPE_LINES = [
+  {t:'load',m:'Connecting to website…',d:300},
+  {t:'ok',m:'Homepage detected — scraping metadata',d:700},
+  {t:'ok',m:'Business name confirmed',d:400},
+  {t:'ok',m:'Industry detected: Marketing Agency',d:500},
+  {t:'ok',m:'Contact info extracted',d:400},
+  {t:'load',m:'Building CRM structure…',d:600},
+  {t:'ok',m:'CRM created — 3 pipeline stages',d:400},
+  {t:'ok',m:'AI Agent trained on business data',d:800},
+  {t:'ok',m:'Sub-domain generated',d:300},
+  {t:'ok',m:'All systems ready ✓',d:200},
+];
+
+function goStep2() {
+  const name = document.getElementById('bizName').value.trim();
+  if (!name) { alert('Please enter a business name'); return; }
+  startTime = Date.now();
+  setStep(2);
+  runScrape(name);
+}
+
+function runScrape(name) {
+  const log = document.getElementById('scrapeLog');
+  log.innerHTML = '';
+  let delay = 0;
+  SCRAPE_LINES.forEach((line, i) => {
+    delay += line.d;
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = `scrape-line ${line.t}`;
+      div.style.animationDelay = '0s';
+      div.textContent = line.m;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+      if (i === SCRAPE_LINES.length-1) showPreview(name);
+    }, delay);
+  });
+}
+
+function showPreview(name) {
+  const industry = document.getElementById('bizIndustry').value || 'Marketing Agency';
+  const slug = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  document.getElementById('prev-biz').textContent = name;
+  document.getElementById('prev-ind').textContent = industry;
+  document.getElementById('prev-agent').textContent = name + ' AI Assistant';
+  document.getElementById('prev-domain').textContent = slug + '.phenexai.app';
+  document.getElementById('aiPreview').style.display = 'block';
+  document.getElementById('step2Next').style.display = 'flex';
+  document.getElementById('step2Next').style.justifyContent = 'center';
+}
+
+function goStep3() { setStep(3); }
+
+function goStep4() {
+  setStep(4);
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  document.getElementById('timerDisplay').textContent = elapsed;
+}
+
+function setStep(n) {
+  document.querySelectorAll('.form-step').forEach((s,i) => { s.classList.toggle('active', i===n-1); });
+  document.getElementById('progressFill').style.width = (n*25)+'%';
+  for(let i=1;i<=4;i++) {
+    const si = document.getElementById('sStep'+i);
+    const sn = document.getElementById('sNum'+i);
+    si.className = 'step-item' + (i<n?' done':i===n?' active':'');
+    sn.textContent = i<n ? '✓' : i;
+  }
+}
+
+function toggleInt(el, name) {
+  el.classList.toggle('connected');
+  el.querySelector('.int-status').textContent = el.classList.contains('connected') ? '✓' : '';
+}
+</script>
+</body></html>

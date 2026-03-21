@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Workflows</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.wf-layout { display:grid;grid-template-columns:300px 1fr;gap:20px;height:calc(100vh - 130px); }
+.wf-list { display:flex;flex-direction:column;gap:10px;overflow-y:auto; }
+.wf-card { background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:16px;cursor:pointer;transition:all 0.2s;position:relative; }
+.wf-card:hover { border-color:var(--glass-border2);transform:translateX(2px); }
+.wf-card.active { border-color:rgba(74,85,224,0.4);background:rgba(74,85,224,0.08); }
+.wf-card-name { font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:4px; }
+.wf-card-desc { font-size:12px;color:var(--text-muted);margin-bottom:10px; }
+.wf-card-footer { display:flex;align-items:center;justify-content:space-between; }
+.wf-status { display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px; }
+.wf-status.on { background:rgba(34,211,160,0.12);color:var(--success); }
+.wf-status.off { background:var(--glass);color:var(--text-muted);border:1px solid var(--glass-border); }
+.wf-runs { font-size:11px;color:var(--text-muted); }
+
+/* Builder canvas */
+.wf-canvas { background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column; }
+.wf-canvas-top { padding:16px 20px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between; }
+.wf-canvas-body { flex:1;overflow:auto;padding:30px;display:flex;flex-direction:column;align-items:center;gap:0;position:relative; }
+.wf-node {
+  background:#0d0f2e;border:1px solid var(--glass-border);border-radius:14px;padding:16px 20px;
+  width:280px;position:relative;transition:all 0.2s;cursor:pointer;
+}
+.wf-node:hover { border-color:var(--glass-border2);box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+.wf-node.trigger { border-color:rgba(74,85,224,0.4);background:rgba(74,85,224,0.06); }
+.wf-node.action { border-color:rgba(34,211,160,0.25);background:rgba(34,211,160,0.04); }
+.wf-node.condition { border-color:rgba(255,181,71,0.3);background:rgba(255,181,71,0.04); }
+.wf-node-badge { font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;display:inline-block;margin-bottom:8px; }
+.wf-node.trigger .wf-node-badge { background:rgba(74,85,224,0.2);color:var(--blue-light); }
+.wf-node.action .wf-node-badge { background:rgba(34,211,160,0.12);color:var(--success); }
+.wf-node.condition .wf-node-badge { background:rgba(255,181,71,0.12);color:var(--warning); }
+.wf-node-title { font-size:14px;font-weight:700;color:var(--text); }
+.wf-node-sub { font-size:12px;color:var(--text-muted);margin-top:3px; }
+.wf-node-icon { position:absolute;top:14px;right:14px;font-size:20px; }
+.wf-arrow { width:2px;height:36px;background:linear-gradient(180deg,var(--glass-border2),var(--glass-border));margin:0 auto;position:relative; }
+.wf-arrow::after { content:'▼';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--glass-border2); }
+.wf-add-node { width:280px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:1.5px dashed var(--glass-border);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;margin-top:36px;transition:all 0.2s; }
+.wf-add-node:hover { border-color:var(--blue-accent);color:var(--blue-light);background:rgba(74,85,224,0.05); }
+.wf-branch { display:flex;gap:20px;justify-content:center;width:100%; }
+.wf-branch-line { display:flex;flex-direction:column;align-items:center; }
+.wf-branch-label { font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:8px; }
+.wf-branch-yes { background:rgba(34,211,160,0.12);color:var(--success); }
+.wf-branch-no { background:rgba(255,91,127,0.12);color:var(--danger); }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Workflows</div><div style="font-size:13px;color:var(--text-muted);margin-top:3px">Automate your business with AI-powered flows</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('Templates loading…','info')">📋 Templates</button>
+          <button class="btn btn-primary" onclick="newWorkflow()">+ New Workflow</button>
+        </div>
+      </div>
+
+      <div class="wf-layout anim-up d1">
+
+        <!-- Workflow list -->
+        <div class="wf-list">
+          <div class="wf-card active" id="wf1" onclick="selectWF('wf1',this)">
+            <div class="wf-card-name">🔥 New Lead Follow-up</div>
+            <div class="wf-card-desc">Auto-email + AI reply when new lead arrives</div>
+            <div class="wf-card-footer"><span class="wf-status on">● Active</span><span class="wf-runs">Ran 214 times</span></div>
+          </div>
+          <div class="wf-card" id="wf2" onclick="selectWF('wf2',this)">
+            <div class="wf-card-name">📅 Appointment Reminder</div>
+            <div class="wf-card-desc">SMS reminder 24h and 1h before meeting</div>
+            <div class="wf-card-footer"><span class="wf-status on">● Active</span><span class="wf-runs">Ran 89 times</span></div>
+          </div>
+          <div class="wf-card" id="wf3" onclick="selectWF('wf3',this)">
+            <div class="wf-card-name">💳 Invoice Follow-up</div>
+            <div class="wf-card-desc">Chase overdue invoices automatically</div>
+            <div class="wf-card-footer"><span class="wf-status on">● Active</span><span class="wf-runs">Ran 33 times</span></div>
+          </div>
+          <div class="wf-card" id="wf4" onclick="selectWF('wf4',this)">
+            <div class="wf-card-name">❄️ Re-engage Cold Leads</div>
+            <div class="wf-card-desc">Warm up leads inactive for 14+ days</div>
+            <div class="wf-card-footer"><span class="wf-status off">Paused</span><span class="wf-runs">Ran 58 times</span></div>
+          </div>
+          <div class="wf-card" id="wf5" onclick="selectWF('wf5',this)">
+            <div class="wf-card-name">🎉 Deal Won — Onboarding</div>
+            <div class="wf-card-desc">Auto-trigger welcome sequence on close</div>
+            <div class="wf-card-footer"><span class="wf-status off">Paused</span><span class="wf-runs">Ran 12 times</span></div>
+          </div>
+          <div style="padding:12px;background:linear-gradient(135deg,rgba(74,85,224,0.08),rgba(155,109,255,0.05));border:1px dashed rgba(74,85,224,0.2);border-radius:var(--radius-sm);text-align:center;cursor:pointer" onclick="newWorkflow()">
+            <div style="font-size:20px;margin-bottom:4px">✨</div>
+            <div style="font-size:12px;font-weight:700;color:var(--blue-light)">AI Build a Workflow</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Describe what you need</div>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="wf-canvas">
+          <div class="wf-canvas-top">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800" id="canvasTitle">🔥 New Lead Follow-up</div>
+              <div style="font-size:12px;color:var(--text-muted)" id="canvasSub">Trigger: New contact added to CRM</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <span class="wf-status on" id="canvasStatus">● Active</span>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('Workflow editor opened','info')">✏️ Edit</button>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Test run started!','success')">▶ Test Run</button>
+              <label class="toggle" style="transform:scale(0.9)"><input type="checkbox" checked onchange="toggleWF(this)"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="wf-canvas-body" id="canvasBody">
+            <!-- Default flow: New Lead -->
+            <div class="wf-node trigger" onclick="showToast('Edit trigger…','info')">
+              <span class="wf-node-icon">⚡</span>
+              <div class="wf-node-badge">Trigger</div>
+              <div class="wf-node-title">New Contact Added</div>
+              <div class="wf-node-sub">Source: Any · Status: New</div>
+            </div>
+            <div class="wf-arrow"></div>
+            <div class="wf-node action" onclick="showToast('Edit action…','info')">
+              <span class="wf-node-icon">📧</span>
+              <div class="wf-node-badge">Action</div>
+              <div class="wf-node-title">Send Welcome Email</div>
+              <div class="wf-node-sub">Template: "New Lead Welcome" · Immediate</div>
+            </div>
+            <div class="wf-arrow"></div>
+            <div class="wf-node action" onclick="showToast('Edit action…','info')">
+              <span class="wf-node-icon">⏳</span>
+              <div class="wf-node-badge">Action</div>
+              <div class="wf-node-title">Wait 2 Hours</div>
+              <div class="wf-node-sub">Delay before next step</div>
+            </div>
+            <div class="wf-arrow"></div>
+            <div class="wf-node condition" onclick="showToast('Edit condition…','info')">
+              <span class="wf-node-icon">🔀</span>
+              <div class="wf-node-badge">Condition</div>
+              <div class="wf-node-title">Did they reply?</div>
+              <div class="wf-node-sub">Check email open / response</div>
+            </div>
+            <div class="wf-arrow"></div>
+            <div class="wf-branch">
+              <div class="wf-branch-line">
+                <div class="wf-branch-label wf-branch-yes">✓ Yes</div>
+                <div class="wf-node action" style="width:200px" onclick="showToast('Edit…','info')">
+                  <div class="wf-node-badge">Action</div>
+                  <div class="wf-node-title">Tag as Warm</div>
+                  <div class="wf-node-sub">Update CRM status</div>
+                </div>
+              </div>
+              <div class="wf-branch-line">
+                <div class="wf-branch-label wf-branch-no">✗ No</div>
+                <div class="wf-node action" style="width:200px;--stage-color:var(--warning)" onclick="showToast('Edit…','info')">
+                  <div class="wf-node-badge">Action</div>
+                  <div class="wf-node-title">AI Follow-up SMS</div>
+                  <div class="wf-node-sub">AI writes & sends</div>
+                </div>
+              </div>
+            </div>
+            <div class="wf-add-node" onclick="showToast('Add step…','info')">+ Add Step</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW WORKFLOW MODAL -->
+<div class="modal-overlay" id="newWFModal" onclick="if(event.target===this)closeModal('newWFModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">✨ Create Workflow</div><div class="modal-close" onclick="closeModal('newWFModal')">✕</div></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div style="padding:14px;background:linear-gradient(135deg,rgba(74,85,224,0.1),rgba(155,109,255,0.06));border:1px solid rgba(74,85,224,0.2);border-radius:10px;cursor:pointer" onclick="showToast('AI building workflow…','success');closeModal('newWFModal')">
+        <div style="font-weight:700;margin-bottom:4px">✨ AI Build for Me</div>
+        <div style="font-size:12px;color:var(--text-muted)">Describe what you want and AI builds it</div>
+      </div>
+      <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer" onclick="showToast('Template library opening…','info');closeModal('newWFModal')">
+        <div style="font-weight:700;margin-bottom:4px">📋 Start from Template</div>
+        <div style="font-size:12px;color:var(--text-muted)">Pick from 40+ pre-built workflows</div>
+      </div>
+      <div style="padding:14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;cursor:pointer" onclick="showToast('Blank canvas ready!','info');closeModal('newWFModal')">
+        <div style="font-weight:700;margin-bottom:4px">🔧 Build from Scratch</div>
+        <div style="font-size:12px;color:var(--text-muted)">Full drag-and-drop builder</div>
+      </div>
+    </div>
+    <div class="field-group"><label class="field-label">Or describe your workflow to AI</label><input class="field-input" placeholder="e.g. When a new lead from LinkedIn signs up, wait 1 hour then send a welcome email…"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showToast('AI building your workflow…','success');closeModal('newWFModal')">Build with AI ✨</button>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('workflows.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Workflows', 'Automate your business processes');
+
+function selectWF(id, el) {
+  document.querySelectorAll('.wf-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function newWorkflow() { openModal('newWFModal'); }
+function toggleWF(cb) { showToast(cb.checked ? 'Workflow activated!' : 'Workflow paused', cb.checked ? 'success' : 'warning'); }
+</script>
+</body></html>

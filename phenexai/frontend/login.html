@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Login</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.auth-wrap { width:100%; max-width:420px; padding:20px; }
+.auth-card {
+  background:rgba(13,15,46,0.95);
+  border:1px solid var(--glass-border2);
+  border-radius:24px; padding:40px;
+  box-shadow:0 20px 80px rgba(0,0,0,0.5);
+  backdrop-filter:blur(20px);
+}
+.auth-logo { text-align:center; margin-bottom:28px; }
+.auth-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin-bottom:6px; text-align:center; }
+.auth-sub { font-size:13px; color:var(--text-muted); text-align:center; margin-bottom:28px; }
+.auth-tabs { display:flex; background:var(--glass); border:1px solid var(--glass-border); border-radius:10px; padding:4px; margin-bottom:24px; }
+.auth-tab { flex:1; padding:8px; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; text-align:center; color:var(--text-muted); transition:all 0.2s; }
+.auth-tab.active { background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright)); color:#fff; }
+.error-msg { background:rgba(255,91,127,0.12); border:1px solid rgba(255,91,127,0.3); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--danger); margin-bottom:14px; display:none; }
+.success-msg { background:rgba(34,211,160,0.12); border:1px solid rgba(34,211,160,0.3); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--success); margin-bottom:14px; display:none; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg viewBox="0 0 280 70" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:180px">
+        <defs>
+          <linearGradient id="wg" x1="140" y1="0" x2="140" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#9ba8ff"/><stop offset="100%" stop-color="#4a55e0"/></linearGradient>
+          <linearGradient id="tg" x1="0" y1="0" x2="200" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#c8ceff"/><stop offset="70%" stop-color="#eef0ff"/></linearGradient>
+          <linearGradient id="ag" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#4a55e0"/><stop offset="100%" stop-color="#8b97ff"/></linearGradient>
+        </defs>
+        <path d="M140 4 L112 17 L122 15 L117 23 L130 14 L134 21 L138 8 Z" fill="url(#wg)"/>
+        <path d="M140 4 L168 17 L158 15 L163 23 L150 14 L146 21 L142 8 Z" fill="url(#wg)"/>
+        <text x="4" y="62" font-family="Arial Black,sans-serif" font-weight="900" font-size="38" fill="url(#tg)" letter-spacing="-0.5">phenex</text>
+        <text x="196" y="62" font-family="Arial Black,sans-serif" font-weight="900" font-size="38" fill="url(#ag)">A</text>
+        <circle cx="257" cy="36" r="9" fill="none" stroke="url(#ag)" stroke-width="2.2"/>
+        <circle cx="257" cy="36" r="3.5" fill="none" stroke="url(#ag)" stroke-width="1.8"/>
+        <line x1="266" y1="30" x2="274" y2="23" stroke="url(#ag)" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="275.5" cy="21.5" r="3.5" fill="url(#ag)"/>
+        <line x1="257" y1="46" x2="257" y2="63" stroke="url(#ag)" stroke-width="6.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="loginTab" onclick="switchTab('login')">Sign In</div>
+      <div class="auth-tab" id="registerTab" onclick="switchTab('register')">Create Account</div>
+    </div>
+
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="loginEmail" type="email" placeholder="you@company.com" autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;font-size:15px" onclick="login()" id="loginBtn">
+        Sign In →
+      </button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted)">
+        Don't have an account? <span style="color:var(--blue-light);cursor:pointer;font-weight:600" onclick="switchTab('register')">Create one free</span>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" id="regName" type="text" placeholder="John Doe">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Business Name</label>
+        <input class="field-input" id="regBusiness" type="text" placeholder="Your Agency Name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="regEmail" type="email" placeholder="you@company.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" id="regPassword" type="password" placeholder="Min 8 characters">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;font-size:15px" onclick="register()" id="registerBtn">
+        Create Account 🚀
+      </button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted)">
+        Already have an account? <span style="color:var(--blue-light);cursor:pointer;font-weight:600" onclick="switchTab('login')">Sign in</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// If already logged in go to dashboard
+if (API.isLoggedIn()) window.location.href = '/index.html';
+
+function switchTab(tab) {
+  document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+  document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  hideMessages();
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('successMsg').style.display = 'none';
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successMsg');
+  el.textContent = '✅ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+}
+
+function hideMessages() {
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'none';
+}
+
+async function login() {
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  if (!email || !pass) return showError('Please fill in all fields');
+
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  try {
+    const data = await API.auth.login(email, pass);
+    API.saveAuth(data.token, data.user);
+    showSuccess('Welcome back! Redirecting…');
+    setTimeout(() => window.location.href = '/index.html', 1000);
+  } catch (err) {
+    showError(err.message);
+    btn.textContent = 'Sign In →';
+    btn.disabled = false;
+  }
+}
+
+async function register() {
+  const btn = document.getElementById('registerBtn');
+  const name = document.getElementById('regName').value.trim();
+  const businessName = document.getElementById('regBusiness').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+
+  if (!name || !email || !password) return showError('Please fill in all required fields');
+  if (password.length < 8) return showError('Password must be at least 8 characters');
+
+  btn.textContent = 'Creating account…';
+  btn.disabled = true;
+
+  try {
+    const data = await API.auth.register({ name, businessName, email, password });
+    API.saveAuth(data.token, data.user);
+    showSuccess('Account created! Redirecting…');
+    setTimeout(() => window.location.href = '/onboarding.html', 1200);
+  } catch (err) {
+    showError(err.message);
+    btn.textContent = 'Create Account 🚀';
+    btn.disabled = false;
+  }
+}
+
+// Enter key support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const loginVisible = document.getElementById('loginForm').style.display !== 'none';
+    loginVisible ? login() : register();
+  }
+});
+</script>
+</body>
+</html>

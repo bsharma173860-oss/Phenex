@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Agency Dashboard</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.agency-header {
+  background: linear-gradient(135deg, rgba(74,85,224,0.15), rgba(155,109,255,0.08));
+  border: 1px solid rgba(74,85,224,0.25);
+  border-radius: var(--radius); padding: 28px; margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.agency-header::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,85,224,0.2), transparent 70%);
+}
+.agency-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(34,211,160,0.12); border: 1px solid rgba(34,211,160,0.25);
+  border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700;
+  color: var(--success); margin-bottom: 8px;
+}
+.sub-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: var(--radius); padding: 20px; cursor: pointer;
+  transition: all 0.25s; position: relative; overflow: hidden;
+}
+.sub-card:hover { border-color: var(--glass-border2); transform: translateY(-3px); box-shadow: var(--shadow-glow); }
+.sub-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--sub-color, var(--blue-accent)); }
+.sub-status { position: absolute; top: 16px; right: 16px; width: 10px; height: 10px; border-radius: 50%; }
+.sub-status.active { background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite; }
+.sub-status.paused { background: var(--warning); }
+.sub-avatar { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 14px; }
+.sub-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.sub-industry { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+.sub-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.sub-stat { background: var(--glass2); border-radius: 8px; padding: 8px 10px; }
+.sub-stat-val { font-size: 16px; font-weight: 800; color: var(--text); }
+.sub-stat-lbl { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+.sub-footer { display: flex; gap: 8px; }
+.ai-pulse {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(155,109,255,0.12), rgba(74,85,224,0.08));
+  border: 1px solid rgba(155,109,255,0.2);
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; font-weight: 600; color: var(--purple);
+  margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+}
+.ai-pulse:hover { border-color: rgba(155,109,255,0.4); transform: translateX(3px); }
+.ai-pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); animation: pulse 1.5s infinite; flex-shrink: 0; }
+.role-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.role-agency { background: rgba(74,85,224,0.15); color: var(--blue-light); }
+.role-admin { background: rgba(155,109,255,0.15); color: var(--purple); }
+.role-user { background: var(--glass); color: var(--text-muted); border: 1px solid var(--glass-border); }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <!-- Agency Header -->
+      <div class="agency-header anim-up">
+        <div>
+          <div class="agency-badge">🏢 Agency Level · Admin</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:6px">Agency Command Center</div>
+          <div style="font-size:14px;color:var(--text-muted)">Manage all your clients from one place. AI handles everything 24/7.</div>
+          <div style="display:flex;gap:12px;margin-top:16px">
+            <button class="btn btn-primary" onclick="openModal('newSubModal')">+ New Sub-Account</button>
+            <button class="btn btn-ghost" onclick="location='white-label.html'">🎨 White Label</button>
+            <button class="btn btn-ghost" onclick="location='agency-billing.html'">💳 Billing</button>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:40px;font-weight:900;font-family:'Syne',sans-serif;color:var(--blue-light)">$<span id="agencyMRR">4,850</span></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Monthly Recurring Revenue</div>
+          <div style="font-size:12px;color:var(--success);font-weight:700;margin-top:4px">↑ 23% this month</div>
+        </div>
+      </div>
+
+      <!-- Agency Stats -->
+      <div class="grid-4 mb-24 anim-up d1">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--blue-glow)"></div><div class="stat-icon">🏢</div><div class="stat-value">6</div><div class="stat-label">Active Sub-Accounts</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(34,211,160,0.1)"></div><div class="stat-icon">👥</div><div class="stat-value">1,847</div><div class="stat-label">Total Leads Across All</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(155,109,255,0.1)"></div><div class="stat-icon">🤖</div><div class="stat-value">98%</div><div class="stat-label">AI Uptime This Month</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(255,181,71,0.1)"></div><div class="stat-icon">⚡</div><div class="stat-value">2,341</div><div class="stat-label">AI Actions Taken Today</div></div>
+      </div>
+
+      <div class="grid-2-1 mb-24">
+        <!-- Sub-accounts grid -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">Sub-Accounts</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">⬇ Export</button>
+              <button class="btn btn-primary btn-sm" onclick="openModal('newSubModal')">+ Add Client</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="subGrid">
+
+            <div class="sub-card" style="--sub-color:#6272ff" onclick="enterSubAccount('TechCorp Inc.')">
+              <div class="sub-status active"></div>
+              <div class="sub-avatar" style="background:linear-gradient(135deg,#4a55e0,#6272ff)">TC</div>
+              <div class="sub-name">TechCorp Inc.</div>
+              <div class="sub-industry">🖥️ SaaS / Tech</div>
+              <div class="sub-stats">
+                <div class="sub-stat"><div class="sub-stat-val">284</div><div class="sub-stat-lbl">Contacts</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--success)">$8.4K</div><div class="sub-stat-lbl">Revenue</div></div>
+                <div class="sub-stat"><div class="sub-stat-val">12</div><div class="sub-stat-lbl">Open Deals</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--purple)">Live 🤖</div><div class="sub-stat-lbl">AI Agent</div></div>
+              </div>
+              <div class="sub-footer">
+                <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();enterSubAccount('TechCorp Inc.')">Enter →</button>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('Opening settings…','info')">⚙️</button>
+              </div>
+            </div>
+
+            <div class="sub-card" style="--sub-color:#22d3a0" onclick="enterSubAccount('Bloom Studio')">
+              <div class="sub-status active"></div>
+              <div class="sub-avatar" style="background:linear-gradient(135deg,#22d3a0,#1aab80)">BS</div>
+              <div class="sub-name">Bloom Studio</div>
+              <div class="sub-industry">🎨 Design Agency</div>
+              <div class="sub-stats">
+                <div class="sub-stat"><div class="sub-stat-val">156</div><div class="sub-stat-lbl">Contacts</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--success)">$5.2K</div><div class="sub-stat-lbl">Revenue</div></div>
+                <div class="sub-stat"><div class="sub-stat-val">7</div><div class="sub-stat-lbl">Open Deals</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--purple)">Live 🤖</div><div class="sub-stat-lbl">AI Agent</div></div>
+              </div>
+              <div class="sub-footer">
+                <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();enterSubAccount('Bloom Studio')">Enter →</button>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('Opening settings…','info')">⚙️</button>
+              </div>
+            </div>
+
+            <div class="sub-card" style="--sub-color:#ffb547" onclick="enterSubAccount('Nova Agency')">
+              <div class="sub-status active"></div>
+              <div class="sub-avatar" style="background:linear-gradient(135deg,#ffb547,#c88a1e)">NA</div>
+              <div class="sub-name">Nova Agency</div>
+              <div class="sub-industry">📣 Marketing</div>
+              <div class="sub-stats">
+                <div class="sub-stat"><div class="sub-stat-val">421</div><div class="sub-stat-lbl">Contacts</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--success)">$12.8K</div><div class="sub-stat-lbl">Revenue</div></div>
+                <div class="sub-stat"><div class="sub-stat-val">19</div><div class="sub-stat-lbl">Open Deals</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--purple)">Live 🤖</div><div class="sub-stat-lbl">AI Agent</div></div>
+              </div>
+              <div class="sub-footer">
+                <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();enterSubAccount('Nova Agency')">Enter →</button>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('Opening settings…','info')">⚙️</button>
+              </div>
+            </div>
+
+            <div class="sub-card" style="--sub-color:#9b6dff" onclick="enterSubAccount('FintechX')">
+              <div class="sub-status paused"></div>
+              <div class="sub-avatar" style="background:linear-gradient(135deg,#9b6dff,#6b4fcc)">FX</div>
+              <div class="sub-name">FintechX</div>
+              <div class="sub-industry">💰 Finance</div>
+              <div class="sub-stats">
+                <div class="sub-stat"><div class="sub-stat-val">98</div><div class="sub-stat-lbl">Contacts</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--success)">$3.1K</div><div class="sub-stat-lbl">Revenue</div></div>
+                <div class="sub-stat"><div class="sub-stat-val">5</div><div class="sub-stat-lbl">Open Deals</div></div>
+                <div class="sub-stat"><div class="sub-stat-val" style="color:var(--warning)">Paused</div><div class="sub-stat-lbl">AI Agent</div></div>
+              </div>
+              <div class="sub-footer">
+                <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();enterSubAccount('FintechX')">Enter →</button>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('Opening settings…','info')">⚙️</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right sidebar: AI Brain + Users -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- AI Brain Status -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">🧠 AI Brain Status</div>
+              <span style="font-size:11px;color:var(--success);font-weight:700">● All Systems Live</span>
+            </div>
+            <div class="ai-pulse" onclick="location='ai-agent.html'">
+              <div class="ai-pulse-dot"></div>
+              Handling TechCorp inbound call now…
+            </div>
+            <div class="ai-pulse" onclick="location='ai-agent.html'">
+              <div class="ai-pulse-dot"></div>
+              Sent 3 follow-ups for Bloom Studio…
+            </div>
+            <div class="ai-pulse" onclick="location='ai-agent.html'">
+              <div class="ai-pulse-dot"></div>
+              Booked 2 appointments for Nova Agency…
+            </div>
+            <div class="ai-pulse" onclick="location='ai-agent.html'">
+              <div class="ai-pulse-dot"></div>
+              Qualified 5 new leads across accounts…
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="location='ai-agent.html'">
+              🤖 Open AI Command Center →
+            </button>
+          </div>
+
+          <!-- Team members -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">👥 Team</div>
+              <span class="card-action" onclick="openModal('inviteModal')">+ Invite</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="avatar avatar-sm">JD</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">John Doe</div><div style="font-size:11px;color:var(--text-muted)">Owner</div></div>
+                <span class="role-badge role-agency">Agency Admin</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#22d3a0,#1aab80)">SK</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Sarah Kim</div><div style="font-size:11px;color:var(--text-muted)">TechCorp · Bloom</div></div>
+                <span class="role-badge role-admin">Sub Admin</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#ffb547,#c88a1e)">MR</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Mike Ross</div><div style="font-size:11px;color:var(--text-muted)">Nova Agency</div></div>
+                <span class="role-badge role-user">Sales Rep</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom:12px">⚡ Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="showToast('AI running across all accounts…','success')">🤖 Run AI Across All Accounts</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="location='agency-billing.html'">💳 View All Billing</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="location='white-label.html'">🎨 White Label Settings</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="showToast('Report generated!','success')">📊 Generate Agency Report</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NEW SUB-ACCOUNT MODAL -->
+<div class="modal-overlay" id="newSubModal" onclick="if(event.target===this)closeModal('newSubModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🏢 New Sub-Account</div><div class="modal-close" onclick="closeModal('newSubModal')">✕</div></div>
+    <div class="field-group"><label class="field-label">Business Name *</label><input class="field-input" id="subBizName" placeholder="e.g. Apex Marketing"></div>
+    <div class="field-group"><label class="field-label">Website</label><input class="field-input" id="subWebsite" placeholder="https://apex.com"></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Industry</label>
+        <select class="field-input"><option>Marketing</option><option>Real Estate</option><option>SaaS</option><option>Healthcare</option><option>Finance</option><option>Other</option></select>
+      </div>
+      <div class="field-group"><label class="field-label">Plan</label>
+        <select class="field-input"><option>Starter - $97/mo</option><option>Pro - $197/mo</option><option>Agency - $297/mo</option></select>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(74,85,224,0.08),rgba(155,109,255,0.05));border:1px solid rgba(74,85,224,0.2);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue-light);margin-bottom:6px">✨ AI will automatically:</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.8">
+        • Scrape their website and set up the account<br>
+        • Train the AI agent on their business<br>
+        • Create a custom pipeline<br>
+        • Set up welcome email & SMS sequences<br>
+        • Configure all automation workflows
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="createSubAccount()">🚀 Create with AI — ~2 min</button>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<div class="modal-overlay" id="inviteModal" onclick="if(event.target===this)closeModal('inviteModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">👥 Invite Team Member</div><div class="modal-close" onclick="closeModal('inviteModal')">✕</div></div>
+    <div class="field-group"><label class="field-label">Email Address</label><input class="field-input" type="email" placeholder="team@company.com"></div>
+    <div class="field-group"><label class="field-label">Role</label>
+      <select class="field-input">
+        <option>Agency Admin — Full access</option>
+        <option>Sub-Account Admin — Manage specific accounts</option>
+        <option>Sales Rep — CRM + Pipeline only</option>
+        <option>Support — Conversations only</option>
+        <option>View Only — Read access</option>
+      </select>
+    </div>
+    <div class="field-group"><label class="field-label">Assign to Sub-Accounts</label>
+      <select class="field-input" multiple style="height:100px">
+        <option>TechCorp Inc.</option><option>Bloom Studio</option><option>Nova Agency</option><option>FintechX</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showToast('Invite sent! ✅','success');closeModal('inviteModal')">Send Invite ✉️</button>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('agency.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Agency <span>Dashboard</span>', 'All your clients · AI running 24/7');
+
+function enterSubAccount(name) {
+  localStorage.setItem('activeSubAccount', name);
+  showToast(`Entering ${name}…`, 'success');
+  setTimeout(() => location.href = 'index.html', 800);
+}
+
+function createSubAccount() {
+  const name = document.getElementById('subBizName').value.trim();
+  if (!name) return showToast('Enter a business name', 'error');
+  showToast(`🤖 AI building ${name}…`, 'success');
+  closeModal('newSubModal');
+  setTimeout(() => location.href = 'onboarding.html', 1000);
+}
+</script>
+</body></html>

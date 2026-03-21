@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Pipeline</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.pipeline-wrap { display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;min-height:calc(100vh - 160px); }
+.pipeline-wrap::-webkit-scrollbar { height:5px; }
+.pipe-col { width:270px;flex-shrink:0;display:flex;flex-direction:column; }
+.pipe-col-header { display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;margin-bottom:2px; }
+.pipe-col-title { font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase; }
+.pipe-col-count { font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px; }
+.pipe-col-total { font-size:11px;color:var(--text-muted);margin-top:2px; }
+.pipe-cards { flex:1;display:flex;flex-direction:column;gap:10px;padding:10px;background:var(--glass);border:1px solid var(--glass-border);border-radius:0 0 var(--radius) var(--radius);min-height:400px; }
+.deal-card { background:#0d0f2e;border:1px solid var(--glass-border);border-radius:12px;padding:14px;cursor:grab;transition:all 0.2s;position:relative;overflow:hidden; }
+.deal-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--stage-color,var(--blue-accent));opacity:0.6; }
+.deal-card:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);border-color:var(--glass-border2); }
+.deal-card-name { font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:6px; }
+.deal-card-company { font-size:12px;color:var(--text-muted);margin-bottom:10px; }
+.deal-card-value { font-size:15px;font-weight:800;color:var(--success);margin-bottom:10px; }
+.deal-card-footer { display:flex;justify-content:space-between;align-items:center; }
+.deal-days { font-size:11px;color:var(--text-muted); }
+.deal-avatar-row { display:flex;gap:-4px; }
+.prob-bar { height:3px;border-radius:3px;background:var(--glass-border);margin-top:8px;overflow:hidden; }
+.prob-fill { height:100%;border-radius:3px;background:var(--stage-color,var(--blue-accent)); }
+.add-deal-btn { display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:transparent;border:1px dashed var(--glass-border);color:var(--text-muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:4px; }
+.add-deal-btn:hover { border-color:var(--glass-border2);color:var(--blue-light);background:var(--glass); }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Pipeline</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:3px">$203,200 total pipeline · 23 open deals</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('Pipeline analytics loading…','info')">📊 Analytics</button>
+          <button class="btn btn-primary" onclick="openModal('addDealModal')">+ Add Deal</button>
+        </div>
+      </div>
+
+      <div class="pipeline-wrap anim-up d1" id="pipelineWrap"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD DEAL MODAL -->
+<div class="modal-overlay" id="addDealModal" onclick="if(event.target===this)closeModal('addDealModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">➕ Add New Deal</div><div class="modal-close" onclick="closeModal('addDealModal')">✕</div></div>
+    <div class="field-group"><label class="field-label">Deal Name *</label><input class="field-input" placeholder="e.g. TechCorp — Growth Package"></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Company</label><input class="field-input" placeholder="Company name"></div>
+      <div class="field-group"><label class="field-label">Deal Value *</label><input class="field-input" type="number" placeholder="15000"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Stage</label>
+        <select class="field-input"><option>Lead</option><option>Qualified</option><option>Proposal</option><option>Negotiation</option><option>Won</option></select>
+      </div>
+      <div class="field-group"><label class="field-label">Close Probability</label>
+        <select class="field-input"><option>10%</option><option>25%</option><option>50%</option><option>75%</option><option>90%</option></select>
+      </div>
+    </div>
+    <div class="field-group"><label class="field-label">Contact</label><input class="field-input" placeholder="Assign to contact…"></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="showToast('Deal added to pipeline!','success');closeModal('addDealModal')">Add Deal ✅</button>
+      <button class="btn btn-ghost" onclick="closeModal('addDealModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('pipeline.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Pipeline', 'Track deals through your sales stages');
+
+const STAGES = [
+  { name:'Lead', color:'#6272ff', bg:'rgba(98,114,255,0.08)', deals:[
+    {name:'Sarah Mitchell',co:'TechCorp Inc.',val:18000,days:2,prob:20},
+    {name:'Ahmed Khan',co:'Nova Agency',val:7200,days:22,prob:15},
+    {name:'Emma Wilson',co:'Creatives Co.',val:6700,days:1,prob:10},
+    {name:'David Chen',co:'SolarWave',val:9400,days:8,prob:25},
+  ]},
+  { name:'Qualified', color:'#9b6dff', bg:'rgba(155,109,255,0.08)', deals:[
+    {name:'Ryan Park',co:'BuildFast Dev',val:18200,days:5,prob:40},
+    {name:'Marcus Patel',co:'FintechX',val:11000,days:15,prob:35},
+  ]},
+  { name:'Proposal', color:'#ffb547', bg:'rgba(255,181,71,0.08)', deals:[
+    {name:'Bloom Studio',co:'Design Team',val:24500,days:4,prob:60},
+    {name:'Julia Thompson',co:'Apex Group',val:15800,days:7,prob:55},
+  ]},
+  { name:'Negotiation', color:'#ff6b9d', bg:'rgba(255,107,157,0.08)', deals:[
+    {name:'TechCorp Inc.',co:'Enterprise',val:48000,days:3,prob:75},
+  ]},
+  { name:'Won', color:'#22d3a0', bg:'rgba(34,211,160,0.08)', deals:[
+    {name:'Apex Group',co:'Onboarding',val:33000,days:0,prob:100},
+    {name:'Lisa Rodriguez',co:'Referral',val:21000,days:0,prob:100},
+  ]},
+];
+
+function buildPipeline() {
+  const wrap = document.getElementById('pipelineWrap');
+  wrap.innerHTML = STAGES.map(stage => {
+    const total = stage.deals.reduce((s,d)=>s+d.val,0);
+    const cards = stage.deals.map(d => `
+      <div class="deal-card" style="--stage-color:${stage.color}" draggable="true">
+        <div class="deal-card-name">${d.name}</div>
+        <div class="deal-card-company">${d.co}</div>
+        <div class="deal-card-value">$${d.val.toLocaleString()}</div>
+        <div class="prob-bar"><div class="prob-fill" style="width:${d.prob}%"></div></div>
+        <div class="deal-card-footer">
+          <span class="deal-days">${d.days===0?'✓ Closed':d.days+'d in stage'}</span>
+          <span style="font-size:11px;font-weight:700;color:${stage.color}">${d.prob}%</span>
+        </div>
+      </div>`).join('');
+    return `
+      <div class="pipe-col">
+        <div class="pipe-col-header" style="background:${stage.bg};border:1px solid ${stage.color}22">
+          <div>
+            <div class="pipe-col-title" style="color:${stage.color}">${stage.name}</div>
+            <div class="pipe-col-total">$${(total/1000).toFixed(0)}K total</div>
+          </div>
+          <div class="pipe-col-count" style="background:${stage.color}22;color:${stage.color}">${stage.deals.length}</div>
+        </div>
+        <div class="pipe-cards" ondragover="event.preventDefault()" ondrop="handleDrop(event,'${stage.name}')">
+          ${cards}
+          <div class="add-deal-btn" onclick="openModal('addDealModal')">+ Add Deal</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function handleDrop(e,stage) { showToast(`Deal moved to ${stage}`,'success'); }
+
+buildPipeline();
+</script>
+</body></html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — White Label</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.wl-preview {
+  background: #07081a; border: 1px solid var(--glass-border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.wl-preview-bar {
+  background: rgba(255,255,255,0.04); padding: 10px 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-muted);
+  border-bottom: 1px solid var(--glass-border);
+}
+.wl-preview-sidebar {
+  width: 200px; background: rgba(7,8,26,0.9);
+  border-right: 1px solid var(--glass-border);
+  padding: 16px 12px; float: left; height: 260px;
+}
+.wl-preview-main { margin-left: 200px; padding: 20px; height: 260px; }
+.color-swatch { width: 36px; height: 36px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; flex-shrink: 0; }
+.color-swatch.selected { border-color: #fff; transform: scale(1.15); }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px" class="anim-up">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">White Label</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:3px">Brand PhenexAi as your own software</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveWhiteLabel()">💾 Save & Publish</button>
+      </div>
+
+      <div class="grid-2 anim-up d1">
+        <!-- Left: Settings -->
+        <div style="display:flex;flex-direction:column;gap:18px">
+
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom:16px">🎨 Branding</div>
+            <div class="field-group">
+              <label class="field-label">Agency / Product Name</label>
+              <input class="field-input" id="wlName" value="PhenexAi" placeholder="Your Brand Name">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Tagline</label>
+              <input class="field-input" id="wlTagline" value="AI-Powered CRM & Automation" placeholder="Your tagline">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Logo</label>
+              <div style="display:flex;gap:10px;align-items:center">
+                <img src="/logo.png" style="width:100px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);border-radius:8px;background:rgba(74,85,224,0.1);padding:8px">
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Upload new logo','info')">⬆ Upload New Logo</button>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Brand Colors</label>
+              <div style="display:flex;gap:10px;margin-top:4px">
+                <div class="color-swatch selected" style="background:linear-gradient(135deg,#4a55e0,#6272ff)" onclick="selectColor(this,'#4a55e0')" title="PhenexAi Blue"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#22d3a0,#1aab80)" onclick="selectColor(this,'#22d3a0')" title="Teal"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#9b6dff,#6b4fcc)" onclick="selectColor(this,'#9b6dff')" title="Purple"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#ff5b7f,#c43060)" onclick="selectColor(this,'#ff5b7f')" title="Pink"></div>
+                <div class="color-swatch" style="background:linear-gradient(135deg,#ffb547,#c88a1e)" onclick="selectColor(this,'#ffb547')" title="Gold"></div>
+                <input type="color" value="#4a55e0" style="width:36px;height:36px;border-radius:8px;border:none;cursor:pointer;background:none" title="Custom color">
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom:16px">🌐 Domain</div>
+            <div class="field-group">
+              <label class="field-label">Custom Domain</label>
+              <input class="field-input" id="wlDomain" placeholder="app.yourbrand.com">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Login Page URL</label>
+              <input class="field-input" id="wlLogin" placeholder="login.yourbrand.com">
+            </div>
+            <div style="background:rgba(74,85,224,0.08);border:1px solid rgba(74,85,224,0.2);border-radius:10px;padding:12px;font-size:12.5px;color:var(--text-muted)">
+              Point your domain's DNS CNAME to: <strong style="color:var(--blue-light)">app.phenexai.io</strong>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom:16px">📱 Mobile App</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:13.5px;font-weight:600">Custom App Name</div><div style="font-size:12px;color:var(--text-muted)">Shows on App Store</div></div>
+                <input class="field-input" value="YourBrand CRM" style="width:160px">
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:13.5px;font-weight:600">App Icon</div><div style="font-size:12px;color:var(--text-muted)">1024x1024 PNG</div></div>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Upload app icon','info')">⬆ Upload</button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div style="font-size:13.5px;font-weight:600">Hide PhenexAi Branding</div><div style="font-size:12px;color:var(--text-muted)">Clients see only your brand</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Preview + Features -->
+        <div style="display:flex;flex-direction:column;gap:18px">
+
+          <!-- Live Preview -->
+          <div class="glass-card">
+            <div class="card-header"><div class="card-title">👁 Live Preview</div><span style="font-size:11px;color:var(--success);font-weight:700">● Updates live</span></div>
+            <div class="wl-preview">
+              <div class="wl-preview-bar">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ff5b5b"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#ffb547"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#22d3a0"></div>
+                <span style="margin-left:8px" id="previewDomain">app.yourbrand.com</span>
+              </div>
+              <div style="display:flex;height:260px">
+                <div class="wl-preview-sidebar">
+                  <img src="/logo.png" style="width:120px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);margin-bottom:16px">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="font-size:10px;padding:5px 8px;border-radius:5px;background:rgba(74,85,224,0.15);color:#8b97ff">▦ Dashboard</div>
+                    <div style="font-size:10px;padding:5px 8px;color:rgba(255,255,255,0.4)">👥 CRM</div>
+                    <div style="font-size:10px;padding:5px 8px;color:rgba(255,255,255,0.4)">💬 Conversations</div>
+                    <div style="font-size:10px;padding:5px 8px;color:rgba(255,255,255,0.4)">🤖 AI Agent</div>
+                  </div>
+                </div>
+                <div class="wl-preview-main">
+                  <div style="font-size:14px;font-weight:800;margin-bottom:6px" id="previewName">YourBrand CRM</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px" id="previewTagline">AI-Powered CRM & Automation</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px"><div style="font-size:14px;font-weight:800">$84K</div><div style="font-size:9px;color:rgba(255,255,255,0.4)">Revenue</div></div>
+                    <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:8px"><div style="font-size:14px;font-weight:800">1,284</div><div style="font-size:9px;color:rgba(255,255,255,0.4)">Contacts</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What clients CAN'T see -->
+          <div class="glass-card">
+            <div class="card-title" style="margin-bottom:14px">🔒 Hide from Clients</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--text-muted)">PhenexAi branding</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--text-muted)">Billing & pricing info</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--text-muted)">Agency other clients</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--text-muted)">Integration API keys</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--text-muted)">Global settings</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="js/phenex.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('white-label.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('White Label <span>Branding</span>', 'Brand PhenexAi as your own platform');
+
+// Live preview updates
+document.getElementById('wlName').addEventListener('input', e => {
+  document.getElementById('previewName').textContent = e.target.value || 'YourBrand CRM';
+});
+document.getElementById('wlTagline').addEventListener('input', e => {
+  document.getElementById('previewTagline').textContent = e.target.value;
+});
+document.getElementById('wlDomain').addEventListener('input', e => {
+  document.getElementById('previewDomain').textContent = e.target.value || 'app.yourbrand.com';
+});
+
+function selectColor(el, color) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  document.documentElement.style.setProperty('--blue-accent', color);
+  showToast('Brand color updated!', 'success');
+}
+
+function saveWhiteLabel() {
+  showToast('White label settings saved & published! 🎨', 'success');
+}
+</script>
+</body></html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Calendar</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.cal-layout { display:grid;grid-template-columns:1fr 340px;gap:20px; }
+.cal-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
+.cal-nav { display:flex;align-items:center;gap:12px; }
+.cal-nav-btn { width:34px;height:34px;border-radius:8px;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);transition:all 0.2s;font-size:16px; }
+.cal-nav-btn:hover { border-color:var(--glass-border2);color:var(--text); }
+.cal-month-title { font-family:'Syne',sans-serif;font-size:20px;font-weight:800; }
+.view-tabs { display:flex;gap:4px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;padding:4px; }
+.view-tab { padding:6px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--text-muted);transition:all 0.2s; }
+.view-tab.active { background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));color:#fff; }
+.cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:2px; }
+.day-label { text-align:center;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);padding:10px 0; }
+.cal-cell { min-height:90px;background:var(--glass);border:1px solid var(--glass-border);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.2s; }
+.cal-cell:hover { border-color:var(--glass-border2);background:var(--glass2); }
+.cal-cell.today { border-color:rgba(74,85,224,0.5);background:rgba(74,85,224,0.06); }
+.cal-cell.other-month { opacity:0.35; }
+.day-num { font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:6px; }
+.cal-cell.today .day-num { color:var(--blue-light); }
+.today-dot { width:6px;height:6px;border-radius:50%;background:var(--blue-bright);display:inline-block;margin-left:4px; }
+.cal-event { font-size:10.5px;font-weight:600;padding:3px 7px;border-radius:5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.cal-event.blue { background:rgba(74,85,224,0.2);color:var(--blue-light); }
+.cal-event.green { background:rgba(34,211,160,0.15);color:var(--success); }
+.cal-event.orange { background:rgba(255,181,71,0.15);color:var(--warning); }
+.cal-event.pink { background:rgba(255,91,127,0.15);color:var(--danger); }
+.cal-event.purple { background:rgba(155,109,255,0.15);color:var(--purple); }
+
+/* Sidebar */
+.appt-list { display:flex;flex-direction:column;gap:0; }
+.appt-card { display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--glass-border); }
+.appt-card:last-child { border-bottom:none; }
+.appt-color-bar { width:3px;border-radius:3px;min-height:40px;flex-shrink:0; }
+.appt-time-col { width:52px;flex-shrink:0;text-align:right; }
+.appt-time-val { font-size:12px;font-weight:700;color:var(--text-dim); }
+.appt-time-dur { font-size:10px;color:var(--text-muted); }
+.appt-details { flex:1; }
+.appt-title-v { font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px; }
+.appt-meta { font-size:11px;color:var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Calendar</div>
+        <button class="btn btn-primary" onclick="openModal('bookModal')">+ Book Appointment</button>
+      </div>
+
+      <div class="cal-layout anim-up d1">
+        <!-- Main calendar -->
+        <div>
+          <div class="glass-card" style="padding:20px">
+            <div class="cal-header">
+              <div class="cal-nav">
+                <button class="cal-nav-btn">‹</button>
+                <div class="cal-month-title">March 2026</div>
+                <button class="cal-nav-btn">›</button>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <button class="btn btn-ghost btn-sm" onclick="showToast('Syncing with Google Calendar…','info')">📅 Sync Google</button>
+                <div class="view-tabs">
+                  <div class="view-tab active">Month</div>
+                  <div class="view-tab" onclick="setView(this)">Week</div>
+                  <div class="view-tab" onclick="setView(this)">Day</div>
+                </div>
+              </div>
+            </div>
+            <div class="cal-grid">
+              <div class="day-label">Sun</div><div class="day-label">Mon</div><div class="day-label">Tue</div><div class="day-label">Wed</div><div class="day-label">Thu</div><div class="day-label">Fri</div><div class="day-label">Sat</div>
+              <!-- Row 1: Feb 22-28 + Mar 1 -->
+              <div class="cal-cell other-month"><div class="day-num">22</div></div>
+              <div class="cal-cell other-month"><div class="day-num">23</div></div>
+              <div class="cal-cell other-month"><div class="day-num">24</div></div>
+              <div class="cal-cell other-month"><div class="day-num">25</div></div>
+              <div class="cal-cell other-month"><div class="day-num">26</div></div>
+              <div class="cal-cell other-month"><div class="day-num">27</div></div>
+              <div class="cal-cell other-month"><div class="day-num">28</div></div>
+              <!-- Row 2 -->
+              <div class="cal-cell"><div class="day-num">1</div></div>
+              <div class="cal-cell"><div class="day-num">2</div></div>
+              <div class="cal-cell"><div class="day-num">3</div><div class="cal-event blue">Discovery — TechCorp</div></div>
+              <div class="cal-cell"><div class="day-num">4</div></div>
+              <div class="cal-cell"><div class="day-num">5</div><div class="cal-event green">Onboarding — Apex</div></div>
+              <div class="cal-cell"><div class="day-num">6</div></div>
+              <div class="cal-cell"><div class="day-num">7</div><div class="cal-event orange">Review — FintechX</div></div>
+              <!-- Row 3 -->
+              <div class="cal-cell"><div class="day-num">8</div></div>
+              <div class="cal-cell"><div class="day-num">9</div></div>
+              <div class="cal-cell"><div class="day-num">10</div><div class="cal-event purple">Strategy Call</div></div>
+              <div class="cal-cell"><div class="day-num">11</div></div>
+              <div class="cal-cell"><div class="day-num">12</div><div class="cal-event pink">Proposal — Nova</div></div>
+              <div class="cal-cell"><div class="day-num">13</div></div>
+              <div class="cal-cell"><div class="day-num">14</div></div>
+              <!-- Row 4 -->
+              <div class="cal-cell"><div class="day-num">15</div></div>
+              <div class="cal-cell"><div class="day-num">16</div></div>
+              <div class="cal-cell today"><div class="day-num">17<span class="today-dot"></span></div><div class="cal-event blue">Discovery — TechCorp</div><div class="cal-event green">Onboarding — Apex</div></div>
+              <div class="cal-cell"><div class="day-num">18</div><div class="cal-event orange">Proposal Review</div></div>
+              <div class="cal-cell"><div class="day-num">19</div></div>
+              <div class="cal-cell"><div class="day-num">20</div><div class="cal-event purple">AI Demo — SolarWave</div></div>
+              <div class="cal-cell"><div class="day-num">21</div></div>
+              <!-- Row 5 -->
+              <div class="cal-cell"><div class="day-num">22</div></div>
+              <div class="cal-cell"><div class="day-num">23</div><div class="cal-event pink">Check-in — Julia T.</div></div>
+              <div class="cal-cell"><div class="day-num">24</div></div>
+              <div class="cal-cell"><div class="day-num">25</div></div>
+              <div class="cal-cell"><div class="day-num">26</div><div class="cal-event blue">Quarterly Review</div></div>
+              <div class="cal-cell"><div class="day-num">27</div></div>
+              <div class="cal-cell"><div class="day-num">28</div></div>
+              <!-- Row 6 -->
+              <div class="cal-cell"><div class="day-num">29</div></div>
+              <div class="cal-cell"><div class="day-num">30</div><div class="cal-event green">Close — BuildFast</div></div>
+              <div class="cal-cell"><div class="day-num">31</div></div>
+              <div class="cal-cell other-month"><div class="day-num">1</div></div>
+              <div class="cal-cell other-month"><div class="day-num">2</div></div>
+              <div class="cal-cell other-month"><div class="day-num">3</div></div>
+              <div class="cal-cell other-month"><div class="day-num">4</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar: today's appointments -->
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="glass-card">
+            <div class="card-header"><div class="card-title">📅 Today — Mar 17</div></div>
+            <div class="appt-list">
+              <div class="appt-card">
+                <div class="appt-time-col"><div class="appt-time-val">9:00</div><div class="appt-time-dur">AM</div></div>
+                <div class="appt-color-bar" style="background:var(--blue-bright)"></div>
+                <div class="appt-details"><div class="appt-title-v">Discovery — TechCorp Inc.</div><div class="appt-meta">📹 Video · 45 min · Sarah Mitchell</div></div>
+              </div>
+              <div class="appt-card">
+                <div class="appt-time-col"><div class="appt-time-val">2:30</div><div class="appt-time-dur">PM</div></div>
+                <div class="appt-color-bar" style="background:var(--success)"></div>
+                <div class="appt-details"><div class="appt-title-v">Onboarding — Apex Group</div><div class="appt-meta">🏢 In Person · 60 min</div></div>
+              </div>
+              <div class="appt-card">
+                <div class="appt-time-col"><div class="appt-time-val">4:00</div><div class="appt-time-dur">PM</div></div>
+                <div class="appt-color-bar" style="background:var(--warning)"></div>
+                <div class="appt-details"><div class="appt-title-v">Proposal Review — FintechX</div><div class="appt-meta">📞 Call · 30 min</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-header"><div class="card-title">🤖 AI Booking Stats</div></div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Booked by AI this week</span><span style="font-weight:700;color:var(--success)">14 appts</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Show rate</span><span style="font-weight:700;color:var(--blue-light)">87%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">No-shows handled by AI</span><span style="font-weight:700;color:var(--warning)">3 rescheduled</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-muted)">Avg booking time</span><span style="font-weight:700">2.3 min</span></div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px">🔗 Integrations</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>📅 Google Calendar</span><span style="color:var(--success);font-weight:700;font-size:11px">● Synced</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>🍎 Apple Calendar</span><span style="color:var(--text-muted);font-size:11px">Connect →</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>📆 Outlook</span><span style="color:var(--text-muted);font-size:11px">Connect →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- BOOK MODAL -->
+<div class="modal-overlay" id="bookModal" onclick="if(event.target===this)closeModal('bookModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📅 Book Appointment</div><div class="modal-close" onclick="closeModal('bookModal')">✕</div></div>
+    <div class="field-group"><label class="field-label">Appointment Title</label><input class="field-input" placeholder="e.g. Discovery Call — TechCorp"></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Date</label><input class="field-input" type="date" value="2026-03-17"></div>
+      <div class="field-group"><label class="field-label">Time</label><input class="field-input" type="time" value="09:00"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Duration</label><select class="field-input"><option>30 min</option><option>45 min</option><option selected>60 min</option><option>90 min</option></select></div>
+      <div class="field-group"><label class="field-label">Type</label><select class="field-input"><option>Video Call</option><option>Phone Call</option><option>In Person</option></select></div>
+    </div>
+    <div class="field-group"><label class="field-label">Contact</label><input class="field-input" placeholder="Search contact…"></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="bookAppt()">Book Appointment ✅</button>
+      <button class="btn btn-ghost" onclick="closeModal('bookModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('calendar.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Calendar', 'Manage appointments & bookings');
+function setView(el) { document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active'); }
+function bookAppt() { showToast('Appointment booked! Invite sent.','success');closeModal('bookModal'); }
+</script>
+</body></html>

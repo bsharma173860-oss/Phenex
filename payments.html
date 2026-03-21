@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — Payments</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.invoice-status { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700; }
+.inv-paid { background:rgba(34,211,160,0.12);color:var(--success); }
+.inv-pending { background:rgba(255,181,71,0.12);color:var(--warning); }
+.inv-overdue { background:rgba(255,91,127,0.12);color:var(--danger); }
+.inv-draft { background:var(--glass);color:var(--text-muted);border:1px solid var(--glass-border); }
+.revenue-bar-wrap { margin-top:14px; }
+.rev-bar-row { display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px; }
+.rev-bar-label { width:70px;color:var(--text-dim);flex-shrink:0; }
+.rev-bar-track { flex:1;height:8px;background:var(--glass-border);border-radius:4px;overflow:hidden; }
+.rev-bar-fill { height:100%;border-radius:4px; }
+.rev-bar-val { width:52px;text-align:right;font-weight:700;color:var(--text);font-size:12px; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">Payments</div><div style="font-size:13px;color:var(--text-muted);margin-top:3px">Stripe connected · Real-time transactions</div></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('Stripe dashboard opening…','info')">🔗 Stripe</button>
+          <button class="btn btn-primary" onclick="openModal('invoiceModal')">+ New Invoice</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid-4 mb-24 anim-up d1">
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(34,211,160,0.15)"></div><div class="stat-change up">↑ 18%</div><div class="stat-icon">💰</div><div class="stat-value">$84.3K</div><div class="stat-label">Revenue This Month</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(255,181,71,0.1)"></div><div class="stat-change down">3 pending</div><div class="stat-icon">⏳</div><div class="stat-value">$29.5K</div><div class="stat-label">Outstanding</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:var(--blue-glow)"></div><div class="stat-change up">↑ 7%</div><div class="stat-icon">📈</div><div class="stat-value">$312K</div><div class="stat-label">Revenue YTD</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(155,109,255,0.1)"></div><div class="stat-change up">↑ 3%</div><div class="stat-icon">🔁</div><div class="stat-value">$12.4K</div><div class="stat-label">Recurring MRR</div></div>
+      </div>
+
+      <div class="grid-2-1 mb-24">
+        <!-- Invoices -->
+        <div class="glass-card anim-up d2" style="padding:0;overflow:hidden">
+          <div style="padding:18px 22px;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
+            <div class="card-title">📄 Invoices</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="showToast('Exported!','success')">⬇ Export</button>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><strong>#INV-0042</strong></td><td>Apex Group</td><td style="font-weight:700;color:var(--success)">$33,000</td><td style="color:var(--text-muted)">Mar 15</td><td><span class="invoice-status inv-paid">● Paid</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Invoice downloaded','info')">⬇</button></td></tr>
+              <tr><td><strong>#INV-0041</strong></td><td>Bloom Studio</td><td style="font-weight:700;color:var(--warning)">$24,500</td><td style="color:var(--text-muted)">Mar 10</td><td><span class="invoice-status inv-pending">● Pending</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Reminder sent!','success')">📧</button></td></tr>
+              <tr><td><strong>#INV-0040</strong></td><td>TechCorp Inc.</td><td style="font-weight:700;color:var(--danger)">$18,000</td><td style="color:var(--text-muted)">Mar 1</td><td><span class="invoice-status inv-overdue">● Overdue</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('AI chasing payment…','success')">🤖</button></td></tr>
+              <tr><td><strong>#INV-0039</strong></td><td>Lisa Rodriguez</td><td style="font-weight:700;color:var(--success)">$21,000</td><td style="color:var(--text-muted)">Feb 28</td><td><span class="invoice-status inv-paid">● Paid</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Invoice downloaded','info')">⬇</button></td></tr>
+              <tr><td><strong>#INV-0038</strong></td><td>BuildFast Dev</td><td style="font-weight:700;color:var(--text-muted)">$7,200</td><td style="color:var(--text-muted)">Feb 20</td><td><span class="invoice-status inv-draft">Draft</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Draft sent!','success')">📤</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Revenue breakdown -->
+        <div class="glass-card anim-up d3">
+          <div class="card-header"><div class="card-title">📊 Revenue by Source</div></div>
+          <div class="revenue-bar-wrap">
+            <div class="rev-bar-row"><div class="rev-bar-label">LinkedIn</div><div class="rev-bar-track"><div class="rev-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--blue-accent),var(--blue-bright))"></div></div><div class="rev-bar-val">$32K</div></div>
+            <div class="rev-bar-row"><div class="rev-bar-label">Referral</div><div class="rev-bar-track"><div class="rev-bar-fill" style="width:58%;background:linear-gradient(90deg,var(--success),#1aab80)"></div></div><div class="rev-bar-val">$24K</div></div>
+            <div class="rev-bar-row"><div class="rev-bar-label">Website</div><div class="rev-bar-track"><div class="rev-bar-fill" style="width:40%;background:linear-gradient(90deg,var(--purple),#7b4fcc)"></div></div><div class="rev-bar-val">$16K</div></div>
+            <div class="rev-bar-row"><div class="rev-bar-label">Instagram</div><div class="rev-bar-track"><div class="rev-bar-fill" style="width:25%;background:linear-gradient(90deg,var(--pink),#d43060)"></div></div><div class="rev-bar-val">$9K</div></div>
+            <div class="rev-bar-row"><div class="rev-bar-label">Facebook</div><div class="rev-bar-track"><div class="rev-bar-fill" style="width:15%;background:linear-gradient(90deg,var(--warning),#c88a1e)"></div></div><div class="rev-bar-val">$3K</div></div>
+          </div>
+          <hr class="divider">
+          <div class="card-title" style="margin-bottom:12px">💳 Payment Methods</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Stripe (Card)</span><span style="font-weight:700">68%</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Bank Transfer</span><span style="font-weight:700">24%</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">PayPal</span><span style="font-weight:700">8%</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoiceModal" onclick="if(event.target===this)closeModal('invoiceModal')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📄 Create Invoice</div><div class="modal-close" onclick="closeModal('invoiceModal')">✕</div></div>
+    <div class="field-group"><label class="field-label">Client *</label><input class="field-input" placeholder="Search client…"></div>
+    <div class="field-group"><label class="field-label">Invoice Description</label><input class="field-input" placeholder="e.g. Monthly retainer — March 2026"></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Amount *</label><input class="field-input" type="number" placeholder="5000"></div>
+      <div class="field-group"><label class="field-label">Due Date</label><input class="field-input" type="date"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Currency</label><select class="field-input"><option>USD $</option><option>GBP £</option><option>EUR €</option><option>CAD $</option></select></div>
+      <div class="field-group"><label class="field-label">Tax (%)</label><input class="field-input" type="number" placeholder="0"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="showToast('Invoice sent via Stripe! ✅','success');closeModal('invoiceModal')">Send Invoice 💳</button>
+      <button class="btn btn-ghost" onclick="showToast('Saved as draft','info');closeModal('invoiceModal')">Save Draft</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('payments.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('Payments', 'Stripe connected · Invoices & transactions');
+</script>
+</body></html>

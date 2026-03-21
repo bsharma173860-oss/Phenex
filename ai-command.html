@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — AI Command Center</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.ai-layout { display:grid;grid-template-columns:340px 1fr 300px;gap:0;height:calc(100vh - 65px);overflow:hidden; }
+
+/* Left: Account selector */
+.ai-accounts-panel {
+  border-right:1px solid var(--glass-border);
+  display:flex;flex-direction:column;
+  background:rgba(7,8,26,0.5);
+}
+.ai-accounts-header { padding:16px;border-bottom:1px solid var(--glass-border); }
+.acc-item {
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02);
+  transition:background 0.15s;position:relative;
+}
+.acc-item:hover { background:var(--glass); }
+.acc-item.active { background:linear-gradient(90deg,rgba(74,85,224,0.1),transparent);border-left:3px solid var(--blue-accent); }
+.acc-item.all { background:linear-gradient(90deg,rgba(155,109,255,0.08),transparent); }
+.acc-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.acc-dot.live { background:var(--success);box-shadow:0 0 6px var(--success);animation:pulse 2s infinite; }
+.acc-dot.idle { background:var(--text-muted); }
+.acc-ai-tag { margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;background:rgba(155,109,255,0.15);color:var(--purple); }
+
+/* Center: Chat */
+.ai-chat-area { display:flex;flex-direction:column;overflow:hidden; }
+.ai-chat-top {
+  padding:14px 20px;border-bottom:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(7,8,26,0.4);flex-shrink:0;
+}
+.ai-brain-avatar {
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue-accent),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 20px rgba(155,109,255,0.4);
+  animation:glow-pulse 3s infinite;
+}
+.messages-scroll { flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px; }
+.msg-wrap { display:flex;gap:10px;align-items:flex-start;animation:fadeUp 0.35s ease; }
+.msg-wrap.user { flex-direction:row-reverse; }
+.msg-av { width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0; }
+.msg-av.ai { background:linear-gradient(135deg,var(--blue-accent),var(--purple)); }
+.msg-av.user { background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);font-size:16px; }
+.msg-bubble { padding:12px 16px;border-radius:14px;font-size:13.5px;line-height:1.6;max-width:75%; }
+.msg-wrap.ai .msg-bubble { background:rgba(74,85,224,0.1);border:1px solid rgba(74,85,224,0.2);border-radius:4px 14px 14px 14px; }
+.msg-wrap.user .msg-bubble { background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));color:#fff;border-radius:14px 4px 14px 14px; }
+.msg-meta { font-size:10px;color:var(--text-muted);margin-top:5px; }
+.msg-wrap.user .msg-meta { text-align:right; }
+
+/* Action result cards inside messages */
+.action-card {
+  background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.2);
+  border-radius:10px;padding:12px 14px;margin-top:10px;font-size:12.5px;
+}
+.action-card-title { font-weight:700;color:var(--success);margin-bottom:6px;font-size:12px; }
+.action-row { display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+.action-row:last-child { border-bottom:none; }
+
+/* Quick command chips */
+.chips-wrap { padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--glass-border);background:rgba(7,8,26,0.3);flex-shrink:0; }
+.cmd-chip { padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-dim);transition:all 0.2s;white-space:nowrap; }
+.cmd-chip:hover { border-color:var(--glass-border2);color:var(--blue-light);background:rgba(74,85,224,0.08);transform:translateY(-1px); }
+
+/* Composer */
+.ai-composer { padding:14px 20px;border-top:1px solid var(--glass-border);background:rgba(7,8,26,0.4);flex-shrink:0; }
+.composer-box { display:flex;gap:10px;align-items:center; }
+.big-inp { flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:12px;padding:13px 16px;color:var(--text);font-size:13.5px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color 0.2s; }
+.big-inp:focus { border-color:var(--blue-accent); }
+.big-inp::placeholder { color:var(--text-muted); }
+
+/* Right: Live feed */
+.ai-live-panel { border-left:1px solid var(--glass-border);display:flex;flex-direction:column;overflow:hidden; }
+.live-header { padding:14px 16px;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center; }
+.live-feed { flex:1;overflow-y:auto;padding:10px 14px; }
+.live-item { display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.03); }
+.live-item:last-child { border-bottom:none; }
+.live-icon { font-size:16px;flex-shrink:0;margin-top:2px; }
+.live-text { font-size:12px;color:var(--text-dim);line-height:1.5; }
+.live-acc { font-size:10px;color:var(--blue-light);font-weight:700; }
+.live-time { font-size:10px;color:var(--text-muted);margin-left:auto;flex-shrink:0; }
+
+/* Typing indicator */
+.typing { display:flex;gap:4px;align-items:center;padding:12px 16px; }
+.typing-dot { width:7px;height:7px;border-radius:50%;background:var(--blue-light);animation:typingBounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay:0.2s; }
+.typing-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)} }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content" style="overflow:hidden">
+    <div id="topbarMount"></div>
+    <div class="ai-layout">
+
+      <!-- LEFT: Account selector -->
+      <div class="ai-accounts-panel">
+        <div class="ai-accounts-header">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:10px">🏢 Control Panel</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">AI is managing all accounts</div>
+          <div style="display:flex;gap:6px">
+            <div style="flex:1;background:rgba(34,211,160,0.08);border:1px solid rgba(34,211,160,0.2);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:var(--success)">4</div>
+              <div style="font-size:10px;color:var(--text-muted)">Live</div>
+            </div>
+            <div style="flex:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-size:18px;font-weight:800">2,341</div>
+              <div style="font-size:10px;color:var(--text-muted)">Actions Today</div>
+            </div>
+            <div style="flex:1;background:rgba(155,109,255,0.08);border:1px solid rgba(155,109,255,0.2);border-radius:8px;padding:8px;text-align:center">
+              <div style="font-size:18px;font-weight:800;color:var(--purple)">98%</div>
+              <div style="font-size:10px;color:var(--text-muted)">Uptime</div>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-y:auto;flex:1">
+          <div class="acc-item all active" onclick="selectAccount('all',this)">
+            <div class="acc-dot live"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:var(--text)">🌐 All Accounts</div>
+              <div style="font-size:11px;color:var(--text-muted)">6 accounts · 1,847 leads</div>
+            </div>
+            <span class="acc-ai-tag">AGENCY</span>
+          </div>
+          <div class="acc-item" onclick="selectAccount('TechCorp Inc.',this)">
+            <div class="acc-dot live"></div>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#4a55e0,#6272ff)">TC</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">TechCorp Inc.</div>
+              <div style="font-size:11px;color:var(--text-muted)">284 contacts · SaaS</div>
+            </div>
+            <span class="acc-ai-tag">LIVE</span>
+          </div>
+          <div class="acc-item" onclick="selectAccount('Bloom Studio',this)">
+            <div class="acc-dot live"></div>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#22d3a0,#1aab80)">BS</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Bloom Studio</div>
+              <div style="font-size:11px;color:var(--text-muted)">156 contacts · Design</div>
+            </div>
+            <span class="acc-ai-tag">LIVE</span>
+          </div>
+          <div class="acc-item" onclick="selectAccount('Nova Agency',this)">
+            <div class="acc-dot live"></div>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#ffb547,#c88a1e)">NA</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Nova Agency</div>
+              <div style="font-size:11px;color:var(--text-muted)">421 contacts · Marketing</div>
+            </div>
+            <span class="acc-ai-tag">LIVE</span>
+          </div>
+          <div class="acc-item" onclick="selectAccount('FintechX',this)">
+            <div class="acc-dot idle"></div>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#9b6dff,#6b4fcc)">FX</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">FintechX</div>
+              <div style="font-size:11px;color:var(--text-muted)">98 contacts · Finance</div>
+            </div>
+            <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;background:rgba(255,181,71,0.1);color:var(--warning)">IDLE</span>
+          </div>
+          <div class="acc-item" onclick="selectAccount('BuildFast Dev',this)">
+            <div class="acc-dot live"></div>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#ff6b9d,#d43060)">BF</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">BuildFast Dev</div>
+              <div style="font-size:11px;color:var(--text-muted)">203 contacts · Dev</div>
+            </div>
+            <span class="acc-ai-tag">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER: AI Chat -->
+      <div class="ai-chat-area">
+        <div class="ai-chat-top">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="ai-brain-avatar">🧠</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">PhenexAi Brain</div>
+              <div style="font-size:12px;color:var(--text-muted)" id="contextLabel">Managing all 6 accounts simultaneously</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;align-items:center;gap:6px;background:rgba(34,211,160,0.1);border:1px solid rgba(34,211,160,0.2);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--success)">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite"></div>
+              Claude Powered
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="clearChat()">🗑 Clear</button>
+          </div>
+        </div>
+
+        <div class="messages-scroll" id="msgScroll">
+          <div style="text-align:center;font-size:11px;color:var(--text-muted);padding:8px">Today · AI Command Center</div>
+
+          <div class="msg-wrap ai">
+            <div class="msg-av ai">🧠</div>
+            <div>
+              <div class="msg-bubble">
+                Hey! I'm your PhenexAi Brain — powered by Claude. I'm simultaneously managing <strong>6 client accounts</strong> right now.<br><br>
+                I can take any action across any account instantly — book appointments, reply to leads, send invoices, run campaigns, qualify leads, handle calls, and more.<br><br>
+                What do you need me to do? 🚀
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+                <div class="cmd-chip" onclick="quickCmd('Show me what all 6 accounts need right now')">📊 Account overview</div>
+                <div class="cmd-chip" onclick="quickCmd('Find all hot leads across every account')">🔥 Hot leads everywhere</div>
+                <div class="cmd-chip" onclick="quickCmd('Book appointments for all pending leads')">📅 Mass book appointments</div>
+                <div class="cmd-chip" onclick="quickCmd('Send follow-ups to all cold leads')">📧 Follow up cold leads</div>
+                <div class="cmd-chip" onclick="quickCmd('What revenue came in today across all accounts?')">💰 Today\'s revenue</div>
+                <div class="cmd-chip" onclick="quickCmd('Run the weekly AI report for all clients')">📋 Weekly report</div>
+              </div>
+              <div class="msg-meta">Just now · All Accounts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chips-wrap" id="chipsWrap">
+          <div class="cmd-chip" onclick="quickCmd('Handle all inbound calls right now')">📞 Handle calls</div>
+          <div class="cmd-chip" onclick="quickCmd('Send invoices to all overdue clients')">💳 Chase payments</div>
+          <div class="cmd-chip" onclick="quickCmd('Qualify all new leads added today')">⚡ Qualify leads</div>
+          <div class="cmd-chip" onclick="quickCmd('Schedule social posts for all accounts this week')">📣 Social posts</div>
+          <div class="cmd-chip" onclick="quickCmd('Update all CRM pipelines based on recent activity')">🔄 Sync CRM</div>
+        </div>
+
+        <div class="ai-composer">
+          <div class="composer-box">
+            <input class="big-inp" id="cmdInput" placeholder="Tell AI what to do across any account… (e.g. 'Book 10 calls for Nova Agency this week')" onkeydown="if(event.key==='Enter')sendCmd()">
+            <button class="btn btn-ghost" onclick="showToast('Voice input ready','info')">🎤</button>
+            <button class="btn btn-primary" onclick="sendCmd()" style="padding:13px 22px">Send ➤</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live feed -->
+      <div class="ai-live-panel">
+        <div class="live-header">
+          <div style="font-size:13px;font-weight:700">⚡ Live AI Feed</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--success);font-weight:700">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite"></div>
+            Live
+          </div>
+        </div>
+        <div class="live-feed" id="liveFeed">
+          <div class="live-item"><span class="live-icon">📞</span><div><div class="live-acc">TechCorp Inc.</div><div class="live-text">AI handled inbound call from +1555****01 — qualified as hot lead</div></div><span class="live-time">1m</span></div>
+          <div class="live-item"><span class="live-icon">📅</span><div><div class="live-acc">Nova Agency</div><div class="live-text">Booked discovery call for Ahmed Khan — Thu 2pm</div></div><span class="live-time">3m</span></div>
+          <div class="live-item"><span class="live-icon">📧</span><div><div class="live-acc">Bloom Studio</div><div class="live-text">Sent follow-up email to 4 warm leads</div></div><span class="live-time">7m</span></div>
+          <div class="live-item"><span class="live-icon">💳</span><div><div class="live-acc">TechCorp Inc.</div><div class="live-text">Invoice #INV-0042 paid — $8,400 received</div></div><span class="live-time">12m</span></div>
+          <div class="live-item"><span class="live-icon">🔥</span><div><div class="live-acc">BuildFast Dev</div><div class="live-text">3 leads qualified as hot — moved to pipeline</div></div><span class="live-time">18m</span></div>
+          <div class="live-item"><span class="live-icon">💬</span><div><div class="live-acc">Nova Agency</div><div class="live-text">AI replied to 6 WhatsApp messages</div></div><span class="live-time">24m</span></div>
+          <div class="live-item"><span class="live-icon">📊</span><div><div class="live-acc">FintechX</div><div class="live-text">Weekly report generated and emailed to client</div></div><span class="live-time">1h</span></div>
+          <div class="live-item"><span class="live-icon">🤖</span><div><div class="live-acc">Bloom Studio</div><div class="live-text">New sub-account created in 1m 47s</div></div><span class="live-time">2h</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('ai-command.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('AI <span>Command Center</span>', 'Claude controls all your client businesses 24/7');
+
+let currentAccount = 'all';
+let chatHistory = [];
+
+const AI_RESPONSES = {
+  overview: {
+    text: `Here's the full agency overview right now:`,
+    card: { title: '📊 All 6 Accounts — Live Status', rows: [
+      ['TechCorp Inc.', '284 contacts · 12 open deals · $8.4K rev · 🔥 3 hot leads'],
+      ['Bloom Studio', '156 contacts · 7 open deals · $5.2K rev · 📅 2 appts today'],
+      ['Nova Agency', '421 contacts · 19 open deals · $12.8K rev · 📧 6 follow-ups sent'],
+      ['FintechX', '98 contacts · 5 open deals · $3.1K rev · ⏸ AI idle'],
+      ['BuildFast Dev', '203 contacts · 8 open deals · $7.6K rev · 🔥 3 new hot leads'],
+      ['SolarWave', '84 contacts · 4 open deals · $2.1K rev · ✅ All good'],
+    ]},
+    followUp: 'Want me to take any actions on specific accounts?'
+  },
+  hot: {
+    text: `Found hot leads across all accounts — taking action now:`,
+    card: { title: '🔥 Hot Leads Across All Accounts', rows: [
+      ['Sarah Mitchell — TechCorp', 'Score 94 · $18K deal · Sending follow-up now ✅'],
+      ['Ryan Park — BuildFast', 'Score 91 · $14K deal · Booking call now ✅'],
+      ['Julia Thompson — Nova', 'Score 88 · $11K deal · Email drafted ✅'],
+      ['Emma Wilson — TechCorp', 'Score 85 · $9K deal · SMS sent ✅'],
+    ]},
+    followUp: 'I\'ve sent follow-ups to all 4 hot leads. Want me to book calls for them too?'
+  },
+  book: {
+    text: `Checking availability and booking appointments across all accounts now:`,
+    card: { title: '📅 Appointments Booked', rows: [
+      ['Ahmed Khan — Nova Agency', 'Thu Mar 20, 2:00 PM · Video call ✅'],
+      ['Marcus Patel — TechCorp', 'Fri Mar 21, 10:00 AM · Phone call ✅'],
+      ['Emma Wilson — Bloom', 'Thu Mar 20, 3:30 PM · Video call ✅'],
+      ['David Chen — BuildFast', 'Mon Mar 24, 11:00 AM · Phone call ✅'],
+    ]},
+    followUp: 'All 4 appointments booked! Calendar invites sent. Want reminders set up too?'
+  },
+  followup: {
+    text: `Running follow-up campaign across all cold leads now:`,
+    card: { title: '📧 Follow-ups Sent', rows: [
+      ['TechCorp Inc.', '18 cold leads · personalized emails sent ✅'],
+      ['Nova Agency', '34 cold leads · SMS sequences triggered ✅'],
+      ['Bloom Studio', '12 cold leads · emails sent ✅'],
+      ['BuildFast Dev', '9 cold leads · WhatsApp messages sent ✅'],
+    ]},
+    followUp: 'Sent to 73 cold leads total. Expected 32% open rate. I\'ll notify you when they reply.'
+  },
+  revenue: {
+    text: `Here's today's revenue across all accounts:`,
+    card: { title: '💰 Revenue Today', rows: [
+      ['TechCorp Inc.', '$8,400 — Invoice paid ✅'],
+      ['Nova Agency', '$3,200 — 2 new deals closed'],
+      ['Bloom Studio', '$1,800 — Retainer payment'],
+      ['BuildFast Dev', '$950 — Discovery upsell'],
+      ['TOTAL TODAY', '$14,350 💰'],
+    ]},
+    followUp: 'Great day! Want me to send revenue summaries to each client?'
+  },
+  invoice: {
+    text: `Chasing all overdue payments now — sending reminders via email and SMS:`,
+    card: { title: '💳 Overdue Invoices Chased', rows: [
+      ['TechCorp — #INV-0040', '$18,000 overdue · Email + SMS sent ✅'],
+      ['Nova — #INV-0038', '$7,200 overdue · Payment link re-sent ✅'],
+      ['FintechX — #INV-0035', '$4,500 overdue · Escalation email sent ✅'],
+    ]},
+    followUp: 'Chased 3 overdue invoices totaling $29,700. I\'ll follow up again in 48 hours if unpaid.'
+  },
+  call: {
+    text: `Activating AI call handling across all accounts now:`,
+    card: { title: '📞 Call System Active', rows: [
+      ['TechCorp Inc.', 'AI answering inbound calls ✅'],
+      ['Nova Agency', 'AI answering inbound calls ✅'],
+      ['Bloom Studio', 'AI answering inbound calls ✅'],
+      ['BuildFast Dev', 'AI answering inbound calls ✅'],
+    ]},
+    followUp: 'All 4 phone lines are now AI-handled. I\'ll qualify leads, book appointments, and notify you of important calls.'
+  },
+  report: {
+    text: `Generating weekly reports for all clients now:`,
+    card: { title: '📋 Weekly Reports Generated', rows: [
+      ['TechCorp Inc.', '14 new leads · $8.4K rev · 87% AI response rate ✅'],
+      ['Bloom Studio', '8 new leads · $5.2K rev · 91% AI response rate ✅'],
+      ['Nova Agency', '22 new leads · $12.8K rev · 94% AI response rate ✅'],
+      ['BuildFast Dev', '11 new leads · $7.6K rev · 88% AI response rate ✅'],
+    ]},
+    followUp: 'Reports emailed to all 4 clients! Want me to schedule these automatically every Monday?'
+  }
+};
+
+function getResponse(msg) {
+  const m = msg.toLowerCase();
+  if (m.includes('overview') || m.includes('status') || m.includes('all account')) return AI_RESPONSES.overview;
+  if (m.includes('hot') || m.includes('qualify')) return AI_RESPONSES.hot;
+  if (m.includes('book') || m.includes('appointment') || m.includes('schedule')) return AI_RESPONSES.book;
+  if (m.includes('follow') || m.includes('cold') || m.includes('email')) return AI_RESPONSES.followup;
+  if (m.includes('revenue') || m.includes('money') || m.includes('today')) return AI_RESPONSES.revenue;
+  if (m.includes('invoice') || m.includes('payment') || m.includes('overdue') || m.includes('chase')) return AI_RESPONSES.invoice;
+  if (m.includes('call') || m.includes('phone')) return AI_RESPONSES.call;
+  if (m.includes('report') || m.includes('weekly')) return AI_RESPONSES.report;
+  return { text: `On it! Running "${msg}" across ${currentAccount === 'all' ? 'all 6 accounts' : currentAccount} now. I'll report back when done. ✅`, card: null, followUp: null };
+}
+
+function addMsg(content, role, card = null, followUp = null) {
+  const scroll = document.getElementById('msgScroll');
+  const accLabel = currentAccount === 'all' ? 'All Accounts' : currentAccount;
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  let cardHTML = '';
+  if (card) {
+    cardHTML = `<div class="action-card">
+      <div class="action-card-title">${card.title}</div>
+      ${card.rows.map(r => `<div class="action-row"><span style="color:var(--text-dim)">${r[0]}</span><span style="color:var(--text);font-size:11px;text-align:right;max-width:60%">${r[1]}</span></div>`).join('')}
+    </div>`;
+  }
+
+  let followUpHTML = followUp ? `<div style="margin-top:10px;font-size:13px;color:var(--text-muted);font-style:italic">${followUp}</div>` : '';
+
+  if (role === 'user') {
+    scroll.innerHTML += `<div class="msg-wrap user">
+      <div class="msg-av user">👤</div>
+      <div><div class="msg-bubble">${content}</div><div class="msg-meta">${time} · ${accLabel}</div></div>
+    </div>`;
+  } else {
+    scroll.innerHTML += `<div class="msg-wrap ai">
+      <div class="msg-av ai">🧠</div>
+      <div>
+        <div class="msg-bubble">${content}${cardHTML}${followUpHTML}</div>
+        <div class="msg-meta">${time} · ${accLabel}</div>
+      </div>
+    </div>`;
+    // Add to live feed
+    addLiveFeedItem(content.substring(0, 60) + '…', accLabel);
+  }
+  scroll.scrollTop = 9999;
+}
+
+function addTyping() {
+  const scroll = document.getElementById('msgScroll');
+  scroll.innerHTML += `<div class="msg-wrap ai" id="typingIndicator">
+    <div class="msg-av ai">🧠</div>
+    <div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+  </div>`;
+  scroll.scrollTop = 9999;
+}
+
+function removeTyping() { document.getElementById('typingIndicator')?.remove(); }
+
+function sendCmd() {
+  const inp = document.getElementById('cmdInput');
+  const txt = inp.value.trim(); if (!txt) return;
+  addMsg(txt, 'user');
+  inp.value = '';
+  addTyping();
+  const delay = 1000 + Math.random() * 800;
+  setTimeout(() => {
+    removeTyping();
+    const resp = getResponse(txt);
+    addMsg(resp.text, 'ai', resp.card, resp.followUp);
+  }, delay);
+}
+
+function quickCmd(cmd) {
+  document.getElementById('cmdInput').value = cmd;
+  sendCmd();
+}
+
+function selectAccount(name, el) {
+  document.querySelectorAll('.acc-item').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  currentAccount = name;
+  document.getElementById('contextLabel').textContent = name === 'all'
+    ? 'Managing all 6 accounts simultaneously'
+    : `Focused on ${name}`;
+}
+
+function addLiveFeedItem(text, acc) {
+  const feed = document.getElementById('liveFeed');
+  const icons = ['🤖','⚡','✅','📊','🔥','📞','📧','💳'];
+  const icon = icons[Math.floor(Math.random() * icons.length)];
+  const item = document.createElement('div');
+  item.className = 'live-item';
+  item.style.animation = 'fadeUp 0.3s ease';
+  item.innerHTML = `<span class="live-icon">${icon}</span><div><div class="live-acc">${acc}</div><div class="live-text">${text}</div></div><span class="live-time">now</span>`;
+  feed.insertBefore(item, feed.firstChild);
+  if (feed.children.length > 20) feed.lastChild.remove();
+}
+
+function clearChat() {
+  document.getElementById('msgScroll').innerHTML = '<div style="text-align:center;font-size:11px;color:var(--text-muted);padding:8px">Chat cleared</div>';
+  chatHistory = [];
+}
+
+// Auto live feed updates every few seconds
+const liveEvents = [
+  { icon: '📞', acc: 'TechCorp Inc.', text: 'Inbound call answered — lead qualified' },
+  { icon: '📧', acc: 'Nova Agency', text: 'Follow-up sequence triggered for 3 leads' },
+  { icon: '📅', acc: 'Bloom Studio', text: 'Appointment rescheduled by AI' },
+  { icon: '💬', acc: 'BuildFast Dev', text: 'WhatsApp message replied automatically' },
+  { icon: '🔥', acc: 'Nova Agency', text: 'New hot lead detected from LinkedIn' },
+  { icon: '💳', acc: 'TechCorp Inc.', text: 'Payment reminder sent — $8,400 overdue' },
+];
+let liveIdx = 0;
+setInterval(() => {
+  const e = liveEvents[liveIdx % liveEvents.length];
+  addLiveFeedItem(e.text, e.acc);
+  liveIdx++;
+}, 8000);
+</script>
+</body></html>

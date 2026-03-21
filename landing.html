@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — The AI CRM That Runs Your Business 24/7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #05061a;
+  --navy: #080a22;
+  --blue: #4a55e0;
+  --bright: #6272ff;
+  --light: #8b97ff;
+  --teal: #00d4aa;
+  --purple: #9b6dff;
+  --pink: #ff6b9d;
+  --success: #22d3a0;
+  --warning: #ffb547;
+  --text: #eef0ff;
+  --dim: #8891cc;
+  --muted: #3d4278;
+  --glass: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(74,85,224,0.3);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(74,85,224,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 5% 80%, rgba(155,109,255,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,212,170,0.05) 0%, transparent 70%),
+    linear-gradient(160deg, #05061a 0%, #08092a 60%, #05060f 100%);
+}
+
+/* Grid lines */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(74,85,224,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,85,224,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 60px;
+  background: rgba(5,6,26,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo img { height: 38px; filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4); }
+.nav-links { display: flex; gap: 32px; }
+.nav-link { font-size: 14px; color: var(--dim); text-decoration: none; transition: color 0.2s; font-weight: 500; }
+.nav-link:hover { color: var(--text); }
+.nav-cta { display: flex; gap: 12px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 10px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; border: none; }
+.btn-primary { background: linear-gradient(135deg, var(--blue), var(--bright)); color: #fff; box-shadow: 0 4px 24px rgba(74,85,224,0.4); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(74,85,224,0.5); }
+.btn-ghost { background: var(--glass); border: 1px solid var(--border); color: var(--dim); }
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+.btn-lg { padding: 16px 36px; font-size: 16px; border-radius: 14px; }
+.btn-xl { padding: 18px 44px; font-size: 17px; border-radius: 14px; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 40px 80px;
+  position: relative; z-index: 1;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,85,224,0.12); border: 1px solid rgba(74,85,224,0.3);
+  border-radius: 30px; padding: 6px 18px;
+  font-size: 13px; font-weight: 700; color: var(--light);
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+.badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(44px, 7vw, 84px);
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, #fff 0%, var(--light) 50%, var(--teal) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero h1 .blue-grad {
+  background: linear-gradient(135deg, var(--bright), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 21px); color: var(--dim);
+  max-width: 700px; margin: 0 auto 40px;
+  line-height: 1.65; animation: fadeUp 0.6s ease 0.2s both;
+}
+.hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s ease 0.3s both; }
+.hero-stats {
+  display: flex; gap: 48px; justify-content: center;
+  margin-top: 64px; animation: fadeUp 0.6s ease 0.4s both;
+}
+.hero-stat-val { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 900; color: var(--text); }
+.hero-stat-lbl { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+/* ── LIVE DEMO STRIP ── */
+.demo-strip {
+  position: relative; z-index: 1;
+  padding: 0 40px 80px;
+  max-width: 1200px; margin: 0 auto;
+}
+.demo-window {
+  background: rgba(8,10,34,0.9);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 80px rgba(74,85,224,0.15);
+}
+.demo-bar {
+  background: rgba(255,255,255,0.03);
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.demo-dots { display: flex; gap: 6px; }
+.demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+.demo-url {
+  flex: 1; text-align: center;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 14px; font-size: 12px; color: var(--muted);
+}
+.demo-inner { display: grid; grid-template-columns: 220px 1fr; min-height: 520px; }
+.demo-sidebar {
+  background: rgba(5,6,20,0.8); border-right: 1px solid var(--border);
+  padding: 20px 14px;
+}
+.demo-logo { width: 130px; margin-bottom: 24px; filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4); }
+.demo-nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 500; color: var(--muted);
+  margin-bottom: 3px; cursor: default;
+}
+.demo-nav-item.active { background: rgba(74,85,224,0.15); color: var(--light); border-left: 3px solid var(--blue); }
+.demo-main { padding: 24px; overflow: hidden; }
+.demo-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 18px; }
+.demo-stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
+.demo-stat { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.demo-stat-v { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+.demo-stat-l { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.demo-ai-chat { background: rgba(74,85,224,0.06); border: 1px solid rgba(74,85,224,0.2); border-radius: 12px; padding: 14px; }
+.demo-chat-msg { display: flex; gap: 8px; margin-bottom: 10px; }
+.demo-chat-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.demo-chat-bbl { padding: 8px 12px; border-radius: 10px; font-size: 11.5px; line-height: 1.5; }
+.ai-bbl { background: rgba(74,85,224,0.1); border: 1px solid rgba(74,85,224,0.15); border-radius: 3px 10px 10px 10px; }
+.user-bbl { background: linear-gradient(135deg, var(--blue), var(--bright)); color: #fff; border-radius: 10px 3px 10px 10px; }
+
+/* ── VS GHL SECTION ── */
+.section { position: relative; z-index: 1; padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+.section-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); border-radius: 20px; padding: 5px 14px; margin-bottom: 16px; }
+.section-title { font-family: 'Syne', sans-serif; font-size: clamp(32px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+.section-sub { font-size: 17px; color: var(--dim); max-width: 600px; line-height: 1.65; }
+
+.vs-table {
+  width: 100%; border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--border); margin-top: 48px;
+}
+.vs-head { display: grid; grid-template-columns: 2fr 1fr 1fr; background: rgba(255,255,255,0.03); }
+.vs-head-cell { padding: 18px 24px; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; }
+.vs-head-cell.phenex { color: var(--light); background: rgba(74,85,224,0.1); text-align: center; }
+.vs-head-cell.ghl { color: var(--muted); text-align: center; }
+.vs-row { display: grid; grid-template-columns: 2fr 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+.vs-row:hover { background: rgba(255,255,255,0.02); }
+.vs-cell { padding: 16px 24px; font-size: 14px; display: flex; align-items: center; }
+.vs-cell.feature { color: var(--text); font-weight: 500; gap: 10px; }
+.vs-cell.feature-icon { font-size: 18px; }
+.vs-cell.check { justify-content: center; }
+.vs-yes { color: var(--success); font-size: 20px; font-weight: 700; }
+.vs-no { color: var(--muted); font-size: 18px; }
+.vs-partial { color: var(--warning); font-size: 13px; font-weight: 700; }
+.vs-row.highlight { background: rgba(74,85,224,0.05); }
+.vs-row.highlight .vs-cell.feature { color: var(--light); }
+
+/* ── HOW IT WORKS ── */
+.steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-top: 56px; }
+.step-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 18px; padding: 28px 22px;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.step-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--purple)); }
+.step-num { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 900; color: rgba(74,85,224,0.15); line-height: 1; margin-bottom: 12px; }
+.step-icon { font-size: 32px; margin-bottom: 12px; }
+.step-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+.step-desc { font-size: 13.5px; color: var(--dim); line-height: 1.6; }
+
+/* ── FEATURES GRID ── */
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 56px; }
+.feat-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 18px; padding: 28px;
+  transition: all 0.3s;
+}
+.feat-card:hover { border-color: var(--border2); box-shadow: 0 0 40px rgba(74,85,224,0.1); transform: translateY(-3px); }
+.feat-card.featured { background: linear-gradient(135deg, rgba(74,85,224,0.12), rgba(155,109,255,0.06)); border-color: rgba(74,85,224,0.3); }
+.feat-icon { width: 52px; height: 52px; border-radius: 14px; background: rgba(74,85,224,0.12); border: 1px solid rgba(74,85,224,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
+.feat-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.feat-desc { font-size: 13.5px; color: var(--dim); line-height: 1.65; }
+.feat-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; margin-top: 12px; background: rgba(34,211,160,0.1); color: var(--success); border: 1px solid rgba(34,211,160,0.2); }
+
+/* ── PRICING ── */
+.pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 56px; }
+.price-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 20px; padding: 36px 28px;
+  transition: all 0.3s; position: relative;
+}
+.price-card.popular {
+  background: linear-gradient(135deg, rgba(74,85,224,0.14), rgba(155,109,255,0.08));
+  border-color: rgba(74,85,224,0.4);
+  box-shadow: 0 0 60px rgba(74,85,224,0.15);
+  transform: scale(1.04);
+}
+.popular-tag { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--blue), var(--bright)); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 16px; border-radius: 20px; white-space: nowrap; }
+.price-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.price-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+.price-val { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+.price-val span { font-size: 20px; color: var(--muted); vertical-align: top; margin-top: 10px; display: inline-block; }
+.price-period { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.price-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.price-feat { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--dim); }
+.price-feat::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; }
+
+/* ── TESTIMONIALS ── */
+.testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 48px; }
+.testi-card { background: var(--glass); border: 1px solid var(--border); border-radius: 18px; padding: 28px; transition: all 0.3s; }
+.testi-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.testi-stars { color: var(--warning); font-size: 16px; margin-bottom: 14px; letter-spacing: 2px; }
+.testi-quote { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 20px; }
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-av { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.testi-name { font-size: 14px; font-weight: 700; }
+.testi-role { font-size: 12px; color: var(--muted); }
+.testi-badge { margin-left: auto; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: rgba(34,211,160,0.1); color: var(--success); }
+
+/* ── CTA SECTION ── */
+.cta-section {
+  position: relative; z-index: 1;
+  margin: 0 40px 100px;
+  background: linear-gradient(135deg, rgba(74,85,224,0.14), rgba(155,109,255,0.08));
+  border: 1px solid rgba(74,85,224,0.3);
+  border-radius: 28px; padding: 80px 60px;
+  text-align: center; overflow: hidden;
+}
+.cta-section::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(74,85,224,0.2), transparent 70%); }
+.cta-section::after { content: ''; position: absolute; bottom: -60px; left: -60px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle, rgba(155,109,255,0.15), transparent 70%); }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 48px 60px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
+@keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(74,85,224,0.3)}50%{box-shadow:0 0 40px rgba(74,85,224,0.6)} }
+@keyframes typewriter { from{width:0}to{width:100%} }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+
+.float { animation: float 4s ease-in-out infinite; }
+.scroll-fade { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.scroll-fade.visible { opacity: 1; transform: translateY(0); }
+
+/* Responsive */
+@media(max-width:900px) {
+  nav { padding: 14px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+  .steps-grid, .features-grid, .pricing-grid, .testi-grid { grid-template-columns: 1fr; }
+  .demo-inner { grid-template-columns: 1fr; }
+  .demo-sidebar { display: none; }
+  .vs-table { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="bg-grid"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="/logo.png" alt="PhenexAi" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span style="display:none;font-family:'Syne',sans-serif;font-size:22px;font-weight:900;background:linear-gradient(135deg,#8b97ff,#4a55e0);-webkit-background-clip:text;-webkit-text-fill-color:transparent">phenexAi</span>
+  </div>
+  <div class="nav-links">
+    <a href="#how" class="nav-link">How It Works</a>
+    <a href="#vs" class="nav-link">vs GoHighLevel</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+  </div>
+  <div class="nav-cta">
+    <a href="https://app.phenex.ai/login.html" class="btn btn-ghost">Sign In</a>
+    <a href="https://app.phenex.ai/login.html" class="btn btn-primary">Start Free Trial →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Powered by Claude AI · 2,341 actions taken today
+    </div>
+    <h1>
+      The AI That<br>
+      <span class="grad">Runs Your Business</span><br>
+      <span class="blue-grad">While You Sleep</span>
+    </h1>
+    <p class="hero-sub">
+      PhenexAi is the only CRM where the AI doesn't just suggest — it <strong style="color:var(--text)">acts</strong>. 
+      It answers calls, books appointments, replies to leads, sends invoices, and closes deals. 
+      Fully autonomous. 24/7. No humans needed.
+    </p>
+    <div class="hero-ctas">
+      <a href="https://app.phenex.ai/login.html" class="btn btn-primary btn-xl">Start Free — No Card Needed 🚀</a>
+      <a href="#demo" class="btn btn-ghost btn-lg">Watch Live Demo ▶</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">2 min</div>
+        <div class="hero-stat-lbl">Avg account setup time</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div>
+        <div class="hero-stat-val">24/7</div>
+        <div class="hero-stat-lbl">AI agent uptime</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div>
+        <div class="hero-stat-val">10x</div>
+        <div class="hero-stat-lbl">Cheaper than GHL + staff</div>
+      </div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div>
+        <div class="hero-stat-val">$0</div>
+        <div class="hero-stat-lbl">To get started today</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO WINDOW -->
+<div class="demo-strip" id="demo">
+  <div class="demo-window float scroll-fade">
+    <div class="demo-bar">
+      <div class="demo-dots">
+        <div class="demo-dot" style="background:#ff5b5b"></div>
+        <div class="demo-dot" style="background:#ffb547"></div>
+        <div class="demo-dot" style="background:#22d3a0"></div>
+      </div>
+      <div class="demo-url">🔒 app.phenexai.io · Agency Dashboard · Live</div>
+    </div>
+    <div class="demo-inner">
+      <div class="demo-sidebar">
+        <img src="/logo.png" class="demo-logo" onerror="this.style.display='none'">
+        <div class="demo-nav-item active">🧠 AI Command</div>
+        <div class="demo-nav-item">🏢 Agency</div>
+        <div class="demo-nav-item">▦ Dashboard</div>
+        <div class="demo-nav-item">👥 CRM</div>
+        <div class="demo-nav-item">💬 Inbox</div>
+        <div class="demo-nav-item">📅 Calendar</div>
+        <div class="demo-nav-item">💳 Payments</div>
+        <div style="margin-top:16px;padding:10px;background:rgba(34,211,160,0.08);border:1px solid rgba(34,211,160,0.2);border-radius:8px">
+          <div style="font-size:10px;font-weight:700;color:var(--success);margin-bottom:4px">● AI LIVE</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.4)">6 accounts running</div>
+        </div>
+      </div>
+      <div class="demo-main">
+        <div class="demo-title">🧠 AI Command Center</div>
+        <div class="demo-stat-row">
+          <div class="demo-stat"><div class="demo-stat-v" style="color:#22d3a0">$14.3K</div><div class="demo-stat-l">Revenue Today</div></div>
+          <div class="demo-stat"><div class="demo-stat-v">2,341</div><div class="demo-stat-l">AI Actions</div></div>
+          <div class="demo-stat"><div class="demo-stat-v" style="color:#6272ff">98%</div><div class="demo-stat-l">AI Uptime</div></div>
+          <div class="demo-stat"><div class="demo-stat-v" style="color:#ffb547">47</div><div class="demo-stat-l">Appts Booked</div></div>
+        </div>
+        <div class="demo-ai-chat">
+          <div class="demo-chat-msg">
+            <div class="demo-chat-av" style="background:linear-gradient(135deg,#4a55e0,#9b6dff)">🧠</div>
+            <div class="demo-chat-bbl ai-bbl">I've handled 14 inbound calls today, booked 9 appointments, sent 47 follow-ups, and collected $14,300 across all your accounts. Your hottest lead right now is Sarah Mitchell at TechCorp — she replied to the email I sent. Want me to book her call? ✅</div>
+          </div>
+          <div class="demo-chat-msg">
+            <div class="demo-chat-av" style="background:rgba(255,255,255,0.08)">👤</div>
+            <div class="demo-chat-bbl user-bbl">Yes book it, and chase all overdue invoices</div>
+          </div>
+          <div class="demo-chat-msg">
+            <div class="demo-chat-av" style="background:linear-gradient(135deg,#4a55e0,#9b6dff)">🧠</div>
+            <div class="demo-chat-bbl ai-bbl">Done ✅ Sarah booked for Thu 2pm. Chasing 3 overdue invoices ($29,700 total) — SMS + email reminders sent. I'll follow up again in 48h if unpaid.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VS GHL TABLE -->
+<div class="section scroll-fade" id="vs">
+  <div class="section-badge">PhenexAi vs GoHighLevel</div>
+  <div class="section-title">Why agencies are switching<br>from GHL to PhenexAi</div>
+  <p class="section-sub">GHL gives you tools. PhenexAi gives you an AI employee that uses those tools for you — automatically.</p>
+
+  <div class="vs-table">
+    <div class="vs-head">
+      <div class="vs-head-cell">Feature</div>
+      <div class="vs-head-cell phenex">🤖 PhenexAi</div>
+      <div class="vs-head-cell ghl">GoHighLevel</div>
+    </div>
+    <div class="vs-row highlight">
+      <div class="vs-cell feature"><span class="feature-icon">🧠</span>AI that takes real actions (not just suggestions)</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-no">✗</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature"><span class="feature-icon">⚡</span>Sub-account created in 2 minutes from website URL</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-partial">Manual setup</span></div>
+    </div>
+    <div class="vs-row highlight">
+      <div class="vs-cell feature"><span class="feature-icon">📞</span>AI answers phone calls & books appointments</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-partial">Add-on only</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature"><span class="feature-icon">💬</span>AI replies to SMS/WhatsApp/Email automatically</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-partial">Basic only</span></div>
+    </div>
+    <div class="vs-row highlight">
+      <div class="vs-cell feature"><span class="feature-icon">🏢</span>Agency command center — control all clients via AI chat</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-no">✗</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature"><span class="feature-icon">🎨</span>Full white-label branding</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+    </div>
+    <div class="vs-row highlight">
+      <div class="vs-cell feature"><span class="feature-icon">💰</span>Starting price</div>
+      <div class="vs-cell check" style="color:var(--success);font-weight:700">$97/mo</div>
+      <div class="vs-cell check" style="color:var(--muted)">$297/mo</div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature"><span class="feature-icon">🤖</span>AI qualifies leads automatically with score</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-no">✗</span></div>
+    </div>
+    <div class="vs-row highlight">
+      <div class="vs-cell feature"><span class="feature-icon">🧩</span>Claude AI brain (most intelligent AI available)</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-no">✗</span></div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-cell feature"><span class="feature-icon">📊</span>CRM, Pipeline, Calendar, Payments, Analytics</div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+      <div class="vs-cell check"><span class="vs-yes">✓</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section scroll-fade" id="how" style="padding-top:0">
+  <div class="section-badge">How It Works</div>
+  <div class="section-title">From zero to running<br>in 2 minutes flat</div>
+  <div class="steps-grid">
+    <div class="step-card scroll-fade">
+      <div class="step-num">01</div>
+      <div class="step-icon">🏢</div>
+      <div class="step-title">Enter business name + website</div>
+      <div class="step-desc">That's literally it. Our AI scrapes the site, learns the business, and builds everything automatically.</div>
+    </div>
+    <div class="step-card scroll-fade">
+      <div class="step-num">02</div>
+      <div class="step-icon">🤖</div>
+      <div class="step-title">AI builds the full account</div>
+      <div class="step-desc">CRM, pipeline, AI agent, calendar, workflows, email sequences — all created in ~2 minutes. Zero manual setup.</div>
+    </div>
+    <div class="step-card scroll-fade">
+      <div class="step-num">03</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-title">Connect integrations</div>
+      <div class="step-desc">Plug in Twilio, Stripe, Google Calendar, WhatsApp in one click. Everything talks to everything.</div>
+    </div>
+    <div class="step-card scroll-fade">
+      <div class="step-num">04</div>
+      <div class="step-icon">🚀</div>
+      <div class="step-title">AI runs the business 24/7</div>
+      <div class="step-desc">Your AI agent handles calls, books appointments, chases payments, and nurtures leads while you sleep.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section scroll-fade" id="features" style="padding-top:0">
+  <div class="section-badge">Features</div>
+  <div class="section-title">Everything you need.<br>Nothing you don't.</div>
+  <div class="features-grid">
+    <div class="feat-card featured scroll-fade">
+      <div class="feat-icon" style="background:rgba(155,109,255,0.15);border-color:rgba(155,109,255,0.3)">🧠</div>
+      <div class="feat-title">AI Command Center</div>
+      <div class="feat-desc">Talk to Claude directly. Tell it to book calls, send invoices, run campaigns, or manage all 6 client accounts at once. It just does it.</div>
+      <span class="feat-tag">⭐ Only on PhenexAi</span>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">🏢</div>
+      <div class="feat-title">Agency Dashboard</div>
+      <div class="feat-desc">See all your client accounts from one place. Revenue, leads, AI status across every sub-account in real time.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon" style="background:rgba(34,211,160,0.12);border-color:rgba(34,211,160,0.2)">⚡</div>
+      <div class="feat-title">2-Minute Onboarding</div>
+      <div class="feat-desc">Enter a business name + website. AI builds the entire account — CRM, pipeline, agent, workflows — in under 2 minutes.</div>
+      <span class="feat-tag">⭐ Only on PhenexAi</span>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">📞</div>
+      <div class="feat-title">AI Voice Agent</div>
+      <div class="feat-desc">Answers inbound calls, qualifies leads, books appointments, and handles objections — in your client's brand voice.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">💬</div>
+      <div class="feat-title">Unified Inbox</div>
+      <div class="feat-desc">SMS, Email, WhatsApp, Facebook, Instagram — all in one thread per contact. AI replies to all of them instantly.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">🎨</div>
+      <div class="feat-title">White Label</div>
+      <div class="feat-desc">Custom domain, your logo, your colors. Clients see your brand, not ours. Full agency rebilling built in.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Smart CRM</div>
+      <div class="feat-desc">AI automatically scores, tags, and moves leads through your pipeline based on behavior and conversations.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">💳</div>
+      <div class="feat-title">Payments + Rebilling</div>
+      <div class="feat-desc">Create invoices, collect payments, and rebill clients for SMS/call usage automatically via Stripe.</div>
+    </div>
+    <div class="feat-card scroll-fade">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Visual Workflow Builder</div>
+      <div class="feat-desc">Build automation flows visually — or just describe what you want to AI and it builds the workflow for you.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="section scroll-fade" id="testimonials" style="padding-top:0">
+  <div class="section-badge">Results</div>
+  <div class="section-title">Agencies are replacing<br>full-time staff with PhenexAi</div>
+  <div class="testi-grid">
+    <div class="testi-card scroll-fade">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"We switched from GHL 3 months ago. The AI handles 80% of our client communication now. We've saved $4,200/month in VA costs and our close rate went from 18% to 34%."</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:linear-gradient(135deg,#4a55e0,#6272ff)">SM</div>
+        <div><div class="testi-name">Sarah Mitchell</div><div class="testi-role">Owner, TechCorp Marketing</div></div>
+        <span class="testi-badge">+34% closes</span>
+      </div>
+    </div>
+    <div class="testi-card scroll-fade">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"Set up a client account in literally 90 seconds. The AI scraped their website, built the pipeline, wrote the email sequences. I was blown away. GHL would have taken me 3 hours."</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:linear-gradient(135deg,#22d3a0,#1aab80)">RK</div>
+        <div><div class="testi-name">Ryan Kim</div><div class="testi-role">Founder, Nova Agency</div></div>
+        <span class="testi-badge">90s setup</span>
+      </div>
+    </div>
+    <div class="testi-card scroll-fade">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"The AI Command Center is unreal. I just type 'follow up with all cold leads this week' and it does it across all 12 of my client accounts simultaneously. Nothing else does this."</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:linear-gradient(135deg,#9b6dff,#6b4fcc)">LP</div>
+        <div><div class="testi-name">Lisa Park</div><div class="testi-role">Agency Owner, 12 Clients</div></div>
+        <span class="testi-badge">12 accounts</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section scroll-fade" id="pricing" style="padding-top:0">
+  <div class="section-badge">Pricing</div>
+  <div class="section-title">3x cheaper than GHL.<br>10x more powerful.</div>
+  <div class="pricing-grid">
+    <div class="price-card scroll-fade">
+      <div class="price-name">Starter</div>
+      <div class="price-desc">For solo operators</div>
+      <div class="price-val"><span>$</span>97</div>
+      <div class="price-period">per month</div>
+      <div class="price-features">
+        <div class="price-feat">3 Sub-accounts</div>
+        <div class="price-feat">AI Agent (1,000 conversations/mo)</div>
+        <div class="price-feat">CRM, Pipeline, Calendar</div>
+        <div class="price-feat">SMS + Email automation</div>
+        <div class="price-feat">Stripe payments</div>
+        <div class="price-feat">Basic white label</div>
+      </div>
+      <a href="https://app.phenex.ai/login.html" class="btn btn-ghost" style="width:100%;justify-content:center;padding:14px">Start Free Trial</a>
+    </div>
+    <div class="price-card popular scroll-fade">
+      <div class="popular-tag">🔥 Most Popular</div>
+      <div class="price-name">Agency Pro</div>
+      <div class="price-desc">For growing agencies</div>
+      <div class="price-val"><span>$</span>197</div>
+      <div class="price-period">per month</div>
+      <div class="price-features">
+        <div class="price-feat">10 Sub-accounts</div>
+        <div class="price-feat">Unlimited AI conversations</div>
+        <div class="price-feat">AI Voice Agent (calls)</div>
+        <div class="price-feat">Full white label + custom domain</div>
+        <div class="price-feat">Rebilling system</div>
+        <div class="price-feat">AI Command Center</div>
+        <div class="price-feat">Priority support</div>
+      </div>
+      <a href="https://app.phenex.ai/login.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px">Start Free Trial 🚀</a>
+    </div>
+    <div class="price-card scroll-fade">
+      <div class="price-name">Enterprise</div>
+      <div class="price-desc">For large agencies</div>
+      <div class="price-val"><span>$</span>497</div>
+      <div class="price-period">per month</div>
+      <div class="price-features">
+        <div class="price-feat">Unlimited sub-accounts</div>
+        <div class="price-feat">Unlimited everything</div>
+        <div class="price-feat">Custom AI training</div>
+        <div class="price-feat">Custom mobile app</div>
+        <div class="price-feat">Dedicated account manager</div>
+        <div class="price-feat">SLA + 99.9% uptime</div>
+        <div class="price-feat">API access</div>
+      </div>
+      <a href="https://app.phenex.ai/login.html" class="btn btn-ghost" style="width:100%;justify-content:center;padding:14px">Contact Sales</a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section scroll-fade">
+  <div style="position:relative;z-index:1">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal);margin-bottom:16px">Ready to replace GoHighLevel?</div>
+    <div style="font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,56px);font-weight:900;margin-bottom:16px;line-height:1.1">
+      Your AI employee is<br>waiting to start work.
+    </div>
+    <div style="font-size:17px;color:var(--dim);margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto">
+      Set up your first client account in 2 minutes. No credit card. No manual setup. AI does everything.
+    </div>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="https://app.phenex.ai/login.html" class="btn btn-primary btn-xl">Start Free Trial — $0 Today 🚀</a>
+      <a href="https://app.phenex.ai/agency.html" class="btn btn-ghost btn-lg">See Live Demo →</a>
+    </div>
+    <div style="margin-top:24px;font-size:13px;color:var(--muted)">
+      No credit card · Free 14-day trial · Cancel anytime
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <img src="/logo.png" style="height:32px;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(200deg) brightness(1.4);margin-bottom:8px" onerror="this.style.display='none'">
+    <div style="font-size:13px;color:var(--muted)">© 2026 PhenexAi. All rights reserved.</div>
+  </div>
+  <div style="display:flex;gap:24px">
+    <a href="#" style="font-size:13px;color:var(--muted);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Privacy</a>
+    <a href="#" style="font-size:13px;color:var(--muted);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Terms</a>
+    <a href="https://app.phenex.ai/login.html" style="font-size:13px;color:var(--light);text-decoration:none;font-weight:600">Login →</a>
+  </div>
+</footer>
+
+<script>
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.scroll-fade').forEach(el => observer.observe(el));
+
+// Live counter
+let actions = 2341;
+setInterval(() => {
+  actions += Math.floor(Math.random() * 3) + 1;
+  const el = document.querySelector('.hero-badge');
+  if (el) el.innerHTML = `<div class="badge-dot" style="width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite"></div> Powered by Claude AI · ${actions.toLocaleString()} actions taken today`;
+}, 3000);
+</script>
+</body>
+</html>

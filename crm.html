@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhenexAi — CRM</title>
+<link rel="stylesheet" href="css/phenex.css">
+<style>
+.filter-bar { display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap; }
+.filter-btn { padding:7px 16px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-dim);transition:all 0.2s; }
+.filter-btn:hover,.filter-btn.active { background:linear-gradient(135deg,rgba(74,85,224,0.2),rgba(98,114,255,0.1));color:var(--blue-light);border-color:rgba(74,85,224,0.3); }
+.contact-row td:first-child { font-weight:600;color:var(--text); }
+.actions-cell { display:flex;gap:6px;align-items:center; }
+.contact-detail-panel {
+  position:fixed;right:-420px;top:0;bottom:0;width:400px;
+  background:#0d0f2e;border-left:1px solid var(--glass-border2);
+  z-index:300;padding:28px;overflow-y:auto;
+  transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:-10px 0 40px rgba(0,0,0,0.4);
+}
+.contact-detail-panel.open { right:0; }
+.panel-close { position:absolute;top:20px;right:20px; }
+.detail-avatar { width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin:0 auto 14px; }
+.detail-section { margin-top:20px; }
+.detail-section-title { font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px; }
+.detail-row { display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--glass-border);font-size:13px; }
+.detail-row:last-child { border-bottom:none; }
+.detail-row-key { color:var(--text-muted); }
+.detail-row-val { color:var(--text);font-weight:500; }
+.timeline-item { display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--glass-border); }
+.timeline-item:last-child { border-bottom:none; }
+.tl-icon { width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="app-layout">
+  <div id="sidebarMount"></div>
+  <div class="main-content">
+    <div id="topbarMount"></div>
+    <div class="page-content">
+
+      <!-- Header row -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="anim-up">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800">CRM Contacts</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:3px">1,284 total contacts · 8 shown</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="showToast('CSV imported!','success')">⬆ Import CSV</button>
+          <button class="btn btn-primary" onclick="openModal('addLeadModal')">+ Add Contact</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid-4 mb-24 anim-up d1">
+        <div class="stat-card"><div class="stat-glow" style="background:var(--blue-glow)"></div><div class="stat-icon">👥</div><div class="stat-value">1,284</div><div class="stat-label">Total Contacts</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(255,91,127,0.12)"></div><div class="stat-icon">🔥</div><div class="stat-value">124</div><div class="stat-label">Hot Leads</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(34,211,160,0.1)"></div><div class="stat-icon">✅</div><div class="stat-value">87</div><div class="stat-label">Closed Won</div></div>
+        <div class="stat-card"><div class="stat-glow" style="background:rgba(255,181,71,0.1)"></div><div class="stat-icon">📞</div><div class="stat-value">342</div><div class="stat-label">Needs Follow-up</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar anim-up d2">
+        <div class="search-box" style="width:240px"><span style="color:var(--text-muted);font-size:14px">🔍</span><input type="text" placeholder="Search contacts…" oninput="filterContacts(this.value)"></div>
+        <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+        <button class="filter-btn" onclick="setFilter(this,'hot')">🔥 Hot</button>
+        <button class="filter-btn" onclick="setFilter(this,'warm')">🌡 Warm</button>
+        <button class="filter-btn" onclick="setFilter(this,'cold')">❄️ Cold</button>
+        <button class="filter-btn" onclick="setFilter(this,'closed')">✅ Closed</button>
+        <button class="filter-btn" onclick="setFilter(this,'new')">🆕 New</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Bulk email sent!','success')">📧 Bulk Email</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Export ready!','info')">⬇ Export</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="glass-card anim-up d3" style="padding:0;overflow:hidden">
+        <table class="data-table" id="contactTable">
+          <thead>
+            <tr style="background:rgba(255,255,255,0.02)">
+              <th style="padding:16px"><input type="checkbox" onclick="toggleAll(this)"></th>
+              <th>Contact</th>
+              <th>Company</th>
+              <th>Phone</th>
+              <th>Source</th>
+              <th>Status</th>
+              <th>Value</th>
+              <th>Last Contact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="contactBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="addLeadModal" onclick="if(event.target===this)closeModal('addLeadModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ Add New Contact</div>
+      <div class="modal-close" onclick="closeModal('addLeadModal')">✕</div>
+    </div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">First Name *</label><input class="field-input" placeholder="Sarah"></div>
+      <div class="field-group"><label class="field-label">Last Name *</label><input class="field-input" placeholder="Mitchell"></div>
+    </div>
+    <div class="field-group"><label class="field-label">Email</label><input class="field-input" type="email" placeholder="sarah@company.com"></div>
+    <div class="field-group"><label class="field-label">Phone</label><input class="field-input" type="tel" placeholder="+1 555 000 0000"></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Company</label><input class="field-input" placeholder="TechCorp Inc."></div>
+      <div class="field-group"><label class="field-label">Lead Value</label><input class="field-input" type="number" placeholder="10000"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Source</label>
+        <select class="field-input"><option>LinkedIn</option><option>Website</option><option>Referral</option><option>Facebook</option><option>Instagram</option><option>Cold Email</option><option>Other</option></select>
+      </div>
+      <div class="field-group"><label class="field-label">Status</label>
+        <select class="field-input"><option>new</option><option>hot</option><option>warm</option><option>cold</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="addContact()">Add Contact ✅</button>
+      <button class="btn btn-ghost" onclick="closeModal('addLeadModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT DETAIL PANEL -->
+<div class="contact-detail-panel" id="detailPanel">
+  <button class="modal-close panel-close" onclick="closePanel()">✕</button>
+  <div id="detailContent"></div>
+</div>
+
+<script src="js/phenex.js"></script>
+<script>
+document.getElementById('sidebarMount').outerHTML = buildSidebar('crm.html');
+document.getElementById('topbarMount').outerHTML = buildTopbar('CRM <span>Contacts</span>', 'Manage your leads, contacts and deals');
+
+let contacts = [...SAMPLE_CONTACTS];
+let filtered = [...contacts];
+
+function renderContacts(data) {
+  const tbody = document.getElementById('contactBody');
+  const statusMap = {hot:'pill-hot',warm:'pill-warm',cold:'pill-cold',closed:'pill-closed',new:'pill-new',active:'pill-active'};
+  tbody.innerHTML = data.map(c => `
+    <tr class="contact-row" onclick="openDetail(${c.id})">
+      <td onclick="event.stopPropagation()"><input type="checkbox"></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar avatar-sm" style="background:${c.color}">${c.avatar}</div>
+          <div><div style="font-weight:600;color:var(--text)">${c.name}</div><div style="font-size:11px;color:var(--text-muted)">${c.email}</div></div>
+        </div>
+      </td>
+      <td>${c.company}</td>
+      <td>${c.phone}</td>
+      <td><span style="font-size:12px">${c.source}</span></td>
+      <td><span class="pill ${statusMap[c.status]||'pill-cold'}">${c.status.charAt(0).toUpperCase()+c.status.slice(1)}</span></td>
+      <td style="color:var(--success);font-weight:700">$${c.value.toLocaleString()}</td>
+      <td style="color:var(--text-muted)">${c.lastContact}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-icon btn-sm" title="Call" onclick="showToast('Calling ${c.name}…','info')">📞</button>
+          <button class="btn btn-ghost btn-icon btn-sm" title="Email" onclick="showToast('Email draft opened','info')">📧</button>
+          <button class="btn btn-ghost btn-icon btn-sm" title="Message" onclick="location='conversations.html'">💬</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterContacts(q) {
+  filtered = contacts.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.company.toLowerCase().includes(q.toLowerCase()));
+  renderContacts(filtered);
+}
+
+function setFilter(btn, status) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtered = status === 'all' ? [...contacts] : contacts.filter(c => c.status === status);
+  renderContacts(filtered);
+}
+
+function toggleAll(cb) { document.querySelectorAll('#contactBody input[type=checkbox]').forEach(c => c.checked = cb.checked); }
+
+function addContact() {
+  showToast('Contact added successfully!', 'success');
+  closeModal('addLeadModal');
+}
+
+function openDetail(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('detailContent').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="detail-avatar" style="background:${c.color}">${c.avatar}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">${c.name}</div>
+      <div style="font-size:13px;color:var(--text-muted)">${c.company}</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn btn-primary btn-sm" onclick="showToast('Calling…','info')">📞 Call</button>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Email draft open','info')">📧 Email</button>
+        <button class="btn btn-ghost btn-sm" onclick="location='conversations.html'">💬 Chat</button>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Contact Info</div>
+      <div class="detail-row"><span class="detail-row-key">Email</span><span class="detail-row-val">${c.email}</span></div>
+      <div class="detail-row"><span class="detail-row-key">Phone</span><span class="detail-row-val">${c.phone}</span></div>
+      <div class="detail-row"><span class="detail-row-key">Source</span><span class="detail-row-val">${c.source}</span></div>
+      <div class="detail-row"><span class="detail-row-key">Value</span><span class="detail-row-val" style="color:var(--success)">$${c.value.toLocaleString()}</span></div>
+      <div class="detail-row"><span class="detail-row-key">Last Contact</span><span class="detail-row-val">${c.lastContact}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Timeline</div>
+      <div class="timeline-item"><div class="tl-icon" style="background:rgba(74,85,224,0.12)">📧</div><div><div style="font-size:13px;color:var(--text)">Follow-up email sent</div><div style="font-size:11px;color:var(--text-muted)">${c.lastContact}</div></div></div>
+      <div class="timeline-item"><div class="tl-icon" style="background:rgba(34,211,160,0.1)">📅</div><div><div style="font-size:13px;color:var(--text)">Meeting booked</div><div style="font-size:11px;color:var(--text-muted)">3 days ago</div></div></div>
+      <div class="timeline-item"><div class="tl-icon" style="background:rgba(255,181,71,0.1)">👤</div><div><div style="font-size:13px;color:var(--text)">Contact created</div><div style="font-size:11px;color:var(--text-muted)">1 week ago</div></div></div>
+    </div>`;
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closePanel() { document.getElementById('detailPanel').classList.remove('open'); }
+renderContacts(contacts);
+</script>
+</body></html>

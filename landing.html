@@ -4,9 +4,320 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhenexAi — Your AI Employee. Always On.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--w:#FFFFFF;--w2:#F5F5F7;--ink:#1d1d1f;--ink2:#3d3d3f;--ink3:#6e6e73;--ink4:#a1a1a6;--blue:#1e1b78;--accent:#4F46E5;--accent2:#6366F1;--alight:#EEF2FF;--green:#10B981;--gold:#F59E0B;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+body{font-family:'DM Sans',sans-serif;background:var(--w);color:var(--ink);overflow-x:hidden;}
+.disp{font-family:'Fraunces',serif;font-weight:300;line-height:1.05;letter-spacing:-.03em;}
+.ital{font-style:italic;color:var(--accent);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 44px;height:62px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.05);}
+.nlogo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);}
+.nlogo img{height:30px;object-fit:contain;}
+.nlt{font-family:'Fraunces',serif;font-size:19px;font-weight:600;letter-spacing:-.02em;}
+.nlinks{display:flex;gap:28px;list-style:none;}
+.nlinks a{font-size:14px;font-weight:500;color:var(--ink3);text-decoration:none;transition:color .2s;}
+.nlinks a:hover{color:var(--ink);}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:9px 20px;border-radius:100px;cursor:pointer;transition:all .2s;text-decoration:none;border:none;}
+.bdark{background:var(--ink);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.bdark:hover{background:var(--ink2);transform:translateY(-1px);}
+.bgh{background:transparent;color:var(--ink3);}
+.bgh:hover{color:var(--ink);background:var(--w2);}
+.bacc{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(79,70,229,.35);}
+.bacc:hover{background:var(--accent2);transform:translateY(-1px);}
+.blg{padding:14px 32px;font-size:16px;}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:110px 44px 80px;text-align:center;position:relative;overflow:hidden;}
+.hbg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(79,70,229,.07);}
+.ra{width:700px;height:700px;top:-200px;right:-150px;}
+.rb{width:500px;height:500px;bottom:-150px;left:-100px;}
+.rc{width:1000px;height:1000px;top:50%;left:50%;transform:translate(-50%,-50%);}
+.hglow{position:absolute;top:5%;left:50%;transform:translateX(-50%);width:700px;height:350px;background:radial-gradient(ellipse,rgba(79,70,229,.07) 0%,transparent 70%);filter:blur(40px);}
+.dgrid{position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(79,70,229,.05) 1px,transparent 0);background-size:48px 48px;}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:var(--alight);border:1px solid rgba(79,70,229,.15);border-radius:100px;padding:5px 14px 5px 7px;font-size:12.5px;font-weight:500;color:var(--accent);margin-bottom:28px;position:relative;z-index:1;animation:fu .6s ease both;}
+.bpill{background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:100px;}
+.ldot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:pg 2s infinite;}
+h1{font-size:clamp(50px,8vw,92px);max-width:860px;margin:0 auto 22px;position:relative;z-index:1;animation:fu .6s ease .1s both;}
+.hsub{font-size:clamp(16px,2vw,20px);color:var(--ink3);max-width:540px;margin:0 auto 40px;line-height:1.65;font-weight:400;position:relative;z-index:1;animation:fu .6s ease .2s both;}
+.hctas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;animation:fu .6s ease .3s both;}
+.cards{position:relative;z-index:1;margin-top:72px;display:flex;gap:18px;justify-content:center;flex-wrap:wrap;align-items:flex-end;animation:fu .8s ease .45s both;}
+.pc{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:28px;padding:26px 22px;width:248px;position:relative;transition:all .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 8px rgba(0,0,0,.05),0 16px 48px rgba(0,0,0,.07);}
+.pc:hover{transform:translateY(-14px) rotate(-1deg) !important;box-shadow:0 4px 12px rgba(0,0,0,.05),0 30px 70px rgba(0,0,0,.1);}
+.pc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);border-radius:28px 28px 0 0;}
+.pcdark{background:var(--ink);border-color:transparent;}
+.pcdark::before{background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);}
+.pcsoon{background:linear-gradient(145deg,#0F0F14,#1a1a2e);border:1px solid rgba(79,70,229,.25);}
+.pcsoon:hover{border-color:rgba(79,70,229,.5) !important;box-shadow:0 20px 60px rgba(79,70,229,.15),0 60px 100px rgba(0,0,0,.1) !important;}
+.pcsoon::before{background:linear-gradient(90deg,transparent,rgba(99,102,241,.3),transparent);}
+.pcicon{width:44px;height:44px;border-radius:12px;background:var(--alight);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+.pcdark .pcicon,.pcsoon .pcicon{background:rgba(255,255,255,.1);}
+.pctier{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:5px;}
+.pcdark .pctier,.pcsoon .pctier{color:rgba(255,255,255,.3);}
+.pcname{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+.pcdark .pcname,.pcsoon .pcname{color:#fff;}
+.pcdesc{font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:14px;}
+.pcdark .pcdesc{color:rgba(255,255,255,.5);}
+.pcsoon .pcdesc{color:rgba(255,255,255,.4);}
+.pcprice{font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:var(--ink);margin-bottom:2px;letter-spacing:-.02em;}
+.pcdark .pcprice{color:#fff;}
+.pcsoon .pcprice{color:#818CF8;}
+.pcper{font-size:10px;color:var(--ink4);margin-bottom:14px;}
+.pcdark .pcper,.pcsoon .pcper{color:rgba(255,255,255,.3);}
+.pcbtn{display:flex;align-items:center;justify-content:center;width:100%;padding:10px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;}
+.pblight{background:var(--alight);color:var(--accent);}
+.pblight:hover{background:var(--accent);color:#fff;}
+.pbwhite{background:#fff;color:var(--ink);}
+.pbwhite:hover{background:var(--w2);}
+.pbsoon{background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.08);cursor:default;}
+.snbadge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 12px;border-radius:100px;white-space:nowrap;box-shadow:0 4px 12px rgba(79,70,229,.4);}
+@keyframes a1{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-18px) rotate(1deg)}}
+@keyframes a2{0%,100%{transform:translateY(-10px) rotate(1deg)}50%{transform:translateY(8px) rotate(-1deg)}}
+@keyframes a3{0%,100%{transform:translateY(-5px) rotate(.5deg)}50%{transform:translateY(-22px) rotate(-1.5deg)}}
+.fa1{animation:a1 7s ease-in-out infinite;}
+.fa2{animation:a2 8s ease-in-out infinite;}
+.fa3{animation:a3 6s ease-in-out infinite;}
+.fa4{animation:a1 9s ease-in-out infinite 1s;}
+.jarvis{background:var(--ink);border-radius:44px;margin:0 44px 72px;padding:72px 56px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.jbg{position:absolute;top:-80px;right:-80px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.12) 0%,transparent 60%);}
+.jeye{display:inline-flex;align-items:center;gap:7px;background:rgba(79,70,229,.2);border:1px solid rgba(79,70,229,.3);border-radius:100px;padding:4px 12px;font-size:10px;font-weight:600;color:#818CF8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;}
+.jh2{font-size:clamp(32px,4vw,48px);color:#fff;margin-bottom:16px;}
+.jsub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:24px;}
+.jprice{font-family:'Fraunces',serif;font-size:48px;font-weight:600;color:#fff;letter-spacing:-.03em;margin-bottom:3px;}
+.jprice span{font-size:20px;color:rgba(255,255,255,.4);vertical-align:top;margin-top:9px;display:inline-block;}
+.jnote{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:26px;}
+.jfeats{display:flex;flex-direction:column;gap:9px;margin-bottom:28px;}
+.jfeat{display:flex;align-items:center;gap:9px;font-size:13.5px;color:rgba(255,255,255,.6);}
+.jfeat::before{content:'✦';color:#818CF8;font-size:8px;flex-shrink:0;}
+.orbw{display:flex;align-items:center;justify-content:center;position:relative;}
+.orb{width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#818CF8 0%,#4F46E5 45%,#1e1b4b 100%);box-shadow:0 0 80px rgba(79,70,229,.5),0 0 160px rgba(79,70,229,.2);animation:of 6s ease-in-out infinite;position:relative;}
+.orb::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.18) 0%,transparent 50%);}
+.orb::after{content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:52px;color:rgba(255,255,255,.9);}
+.orbr{position:absolute;width:380px;height:380px;border-radius:50%;border:1px solid rgba(79,70,229,.15);animation:rs 20s linear infinite;}
+.orbd{position:absolute;width:9px;height:9px;border-radius:50%;background:#818CF8;box-shadow:0 0 12px rgba(99,102,241,.8);animation:do 8s linear infinite;}
+@keyframes of{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+@keyframes rs{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes do{from{transform:rotate(0deg) translateX(190px) rotate(0deg)}to{transform:rotate(360deg) translateX(190px) rotate(-360deg)}}
+.sec{padding:90px 44px;max-width:1160px;margin:0 auto;}
+.secc{text-align:center;}
+.eye{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.h2{font-size:clamp(32px,5vw,54px);max-width:620px;margin:0 auto 16px;}
+.sub{font-size:16px;color:var(--ink3);max-width:500px;margin:0 auto;line-height:1.65;font-weight:400;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:52px;}
+.step{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:22px;padding:26px 20px;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,0,0,.08);}
+.snum{font-family:'Fraunces',serif;font-size:48px;font-weight:300;color:rgba(0,0,0,.05);line-height:1;margin-bottom:12px;}
+.sico{font-size:24px;margin-bottom:10px;}
+.stit{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:7px;}
+.sdesc{font-size:13px;color:var(--ink3);line-height:1.65;}
+.bento{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.bc{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:22px;padding:26px;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.04);position:relative;overflow:hidden;}
+.bc:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.08);}
+.bcw2{grid-column:span 2;}
+.bcdark{background:var(--ink);}
+.bcblue{background:var(--accent);}
+.bi{font-size:26px;margin-bottom:12px;}
+.bt{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:7px;}
+.bcdark .bt,.bcblue .bt{color:#fff;}
+.bd{font-size:13px;color:var(--ink3);line-height:1.65;}
+.bcdark .bd{color:rgba(255,255,255,.5);}
+.bcblue .bd{color:rgba(255,255,255,.75);}
+.bsv{font-family:'Fraunces',serif;font-size:42px;font-weight:300;color:var(--accent);letter-spacing:-.03em;line-height:1;margin-top:18px;}
+.bcdark .bsv{color:#818CF8;}
+.bcblue .bsv{color:rgba(255,255,255,.9);}
+.bsl{font-size:11px;color:var(--ink4);margin-top:2px;}
+.bcdark .bsl{color:rgba(255,255,255,.3);}
+.testis{display:flex;gap:16px;margin-top:48px;overflow-x:auto;padding-bottom:8px;}
+.testis::-webkit-scrollbar{height:0;}
+.tc{min-width:300px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.04);flex-shrink:0;}
+.tst{font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;}
+.tq{font-size:14px;line-height:1.7;color:var(--ink2);margin-bottom:16px;font-style:italic;}
+.tn{font-size:13.5px;font-weight:600;}
+.tr{font-size:11px;color:var(--ink4);}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;align-items:start;}
+.prc{background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:22px;padding:28px 24px;transition:all .3s;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.prc:hover{transform:translateY(-5px);box-shadow:0 14px 44px rgba(0,0,0,.08);}
+.prcp{background:var(--ink);border-color:var(--ink);transform:translateY(-10px);}
+.prcp:hover{transform:translateY(-16px);}
+.ptag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 12px;border-radius:100px;white-space:nowrap;}
+.pn{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:4px;}
+.prcp .pn{color:#fff;}
+.pd{font-size:12px;color:var(--ink4);margin-bottom:18px;}
+.prcp .pd{color:rgba(255,255,255,.35);}
+.ps{font-size:11px;color:var(--ink4);margin-bottom:2px;}
+.prcp .ps{color:rgba(255,255,255,.3);}
+.pp{font-family:'Fraunces',serif;font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1;}
+.prcp .pp{color:#fff;}
+.pper{font-size:11px;color:var(--ink4);margin-bottom:22px;}
+.prcp .pper{color:rgba(255,255,255,.3);}
+.pfs{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
+.pf{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink3);}
+.pf::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px;}
+.prcp .pf{color:rgba(255,255,255,.6);}
+.pbtn{width:100%;padding:12px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-align:center;text-decoration:none;display:block;}
+.pbout{background:transparent;color:var(--ink);border:1.5px solid rgba(0,0,0,.12);}
+.pbout:hover{background:var(--w2);}
+.pbw{background:#fff;color:var(--ink);}
+.pbw:hover{background:var(--w2);}
+.cta{margin:0 44px 72px;background:var(--accent);border-radius:40px;padding:64px 52px;text-align:center;position:relative;overflow:hidden;}
+.cta::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 60%);}
+.ctah{font-size:clamp(32px,5vw,50px);color:#fff;margin-bottom:12px;}
+.ctas{font-size:16px;color:rgba(255,255,255,.65);max-width:440px;margin:0 auto 32px;line-height:1.6;}
+.bw{background:#fff;color:var(--accent);}
+.bw:hover{background:var(--w2);transform:translateY(-2px);}
+.bwg{background:transparent;color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.25);}
+.bwg:hover{background:rgba(255,255,255,.1);color:#fff;}
+footer{padding:36px 44px 24px;border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+.fl{font-family:'Fraunces',serif;font-size:17px;font-weight:600;}
+.flinks{display:flex;gap:20px;}
+.flinks a{font-size:13px;color:var(--ink4);text-decoration:none;transition:color .2s;}
+.flinks a:hover{color:var(--ink);}
+.fc{font-size:11px;color:var(--ink4);}
+.mg{color:var(--accent);font-weight:600;}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pg{0%,100%{box-shadow:0 0 0 2px rgba(16,185,129,.3)}50%{box-shadow:0 0 0 5px rgba(16,185,129,.1)}}
+.sr{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease;}
+.sr.vis{opacity:1;transform:translateY(0);}
+</style>
 </head>
-<body style="font-family:sans-serif;background:#F8F7F4;padding:40px;text-align:center">
-<h1>NEW DESIGN TEST</h1>
-<p>If you see this - the deployment is working!</p>
+<body>
+<nav>
+  <a href="#" class="nlogo">
+    <img src="logo.png" alt="PhenexAi" onerror="this.style.display='none'">
+    <span class="nlt">phenexAi</span>
+  </a>
+  <ul class="nlinks">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <div style="display:flex;gap:10px">
+    <a href="login.html" class="btn bgh">Sign In</a>
+    <a href="https://phenex.ai/#plans" class="btn bdark">Get Started →</a>
+  </div>
+</nav>
+<section class="hero" id="products">
+  <div class="hbg"><div class="ring ra"></div><div class="ring rb"></div><div class="ring rc"></div><div class="hglow"></div><div class="dgrid"></div></div>
+  <div class="hbadge"><span class="bpill">Live</span><div class="ldot"></div>AI handling 200+ businesses right now</div>
+  <h1 class="disp">Your business,<br>run by <span class="ital">AI</span><br>that never stops.</h1>
+  <p class="hsub">From instant AI messaging to JARVIS — an AI that lives on your devices. Four products, one mission: automate everything.</p>
+  <div class="hctas">
+    <a href="https://phenex.ai/#plans" class="btn bdark blg">Start with AI →</a>
+    <a href="#how" class="btn bgh blg">How It Works ↓</a>
+  </div>
+  <div class="cards">
+    <div class="pc fa1" style="transform:rotate(-2deg)">
+      <div class="pcicon">💬</div><div class="pctier">Tier 1</div><div class="pcname">AI Starter</div>
+      <div class="pcdesc">AI replies to every DM, SMS and WhatsApp in under 1 second. 24/7.</div>
+      <div class="pcprice">CA$499</div><div class="pcper">per month · CA$799 setup</div>
+      <button class="pcbtn pblight" onclick="location.href='https://phenex.ai/payment?plan=starter'">Get Started →</button>
+    </div>
+    <div class="pc pcdark fa2" style="transform:translateY(-22px)">
+      <div class="pcicon">🚀</div><div class="pctier">Tier 2 · Popular</div><div class="pcname">AI Growth</div>
+      <div class="pcdesc">Everything in Starter plus CRM, pipeline, auto-booking on autopilot.</div>
+      <div class="pcprice">CA$999</div><div class="pcper">per month · CA$1,499 setup</div>
+      <button class="pcbtn pbwhite" onclick="location.href='https://phenex.ai/payment?plan=growth'">Best Value →</button>
+    </div>
+    <div class="pc fa3" style="transform:rotate(1.5deg)">
+      <div class="pcicon">👑</div><div class="pctier">Tier 3 · Elite</div><div class="pcname">AI Receptionist</div>
+      <div class="pcdesc">Full AI phone agent. Answers calls, sounds human, books 24/7.</div>
+      <div class="pcprice">CA$1,499</div><div class="pcper">per month · CA$1,999 setup</div>
+      <button class="pcbtn pblight" onclick="location.href='https://phenex.ai/payment?plan=elite'">Get Elite →</button>
+    </div>
+    <div class="pc pcsoon fa4" style="transform:translateY(-6px) rotate(-1deg)">
+      <div class="snbadge">✦ Coming Soon — CA$3,499</div>
+      <div class="pcicon">🤖</div><div class="pctier">The Future</div><div class="pcname">JARVIS</div>
+      <div class="pcdesc">Lives on your laptop and phone. Handles everything like Tony Stark's AI.</div>
+      <div class="pcprice">CA$3,499</div><div class="pcper">one-time · lifetime access</div>
+      <button class="pcbtn pbsoon" disabled>Notify Me →</button>
+    </div>
+  </div>
+</section>
+<div class="jarvis sr">
+  <div class="jbg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="jeye"><span style="width:5px;height:5px;border-radius:50%;background:#818CF8"></span>In Research &amp; Development</div>
+    <h2 class="jh2 disp">Meet <span style="font-style:italic;color:#818CF8">JARVIS.</span><br>Your AI that lives with you.</h2>
+    <p class="jsub">We're building the most advanced personal AI for business owners. JARVIS lives on your laptop and phone — thinks, acts and communicates like a real human partner.</p>
+    <div class="jfeats">
+      <div class="jfeat">Talks with you like a real human — answers calls, asks before forwarding</div>
+      <div class="jfeat">Handles all emails, WhatsApp, social media replies automatically</div>
+      <div class="jfeat">Updates CRM and pipeline while on calls with clients</div>
+      <div class="jfeat">Books appointments, manages calendar, reminds you of everything</div>
+      <div class="jfeat">Translates WhatsApp messages in real time</div>
+      <div class="jfeat">Handles multiple simultaneous calls — never misses anything</div>
+      <div class="jfeat">Works on laptop AND phone — always with you, always on</div>
+    </div>
+    <div class="jprice"><span>CA$</span>3,499</div>
+    <div class="jnote">One-time · Lifetime access · Currently in research &amp; development</div>
+    <button class="btn bacc blg" onclick="alert('We will notify you when JARVIS launches!')">✦ Notify Me When It Launches</button>
+  </div>
+  <div class="orbw"><div class="orbr"></div><div class="orb"></div><div class="orbd"></div></div>
+</div>
+<div class="sec secc sr" id="how">
+  <div class="eye">How It Works</div>
+  <h2 class="h2 disp">Live in 7 days.<br>Zero tech skills.</h2>
+  <p class="sub">Our team builds everything. You approve and watch leads roll in.</p>
+  <div class="steps">
+    <div class="step sr"><div class="snum">01</div><div class="sico">🏗️</div><div class="stit">We Build Your AI</div><div class="sdesc">Our team trains your AI on your business. Zero effort from you.</div></div>
+    <div class="step sr"><div class="snum">02</div><div class="sico">🔌</div><div class="stit">Connect All Channels</div><div class="sdesc">SMS, email, Facebook, Instagram, phone, WhatsApp — all connected.</div></div>
+    <div class="step sr"><div class="snum">03</div><div class="sico">⚡</div><div class="stit">AI Starts Working</div><div class="sdesc">Every lead replied to. Every call answered. Every appointment booked.</div></div>
+    <div class="step sr"><div class="snum">04</div><div class="sico">📈</div><div class="stit">Watch Revenue Grow</div><div class="sdesc">Dashboard shows every lead and booking in real time. You close deals.</div></div>
+  </div>
+</div>
+<div class="sec sr" id="features">
+  <div class="secc" style="margin-bottom:0"><div class="eye">Features</div><h2 class="h2 disp">Everything automated.<br>Nothing missed.</h2></div>
+  <div class="bento">
+    <div class="bc bcw2 bcdark sr"><div class="bi">⚡</div><div class="bt">0.3 Second Response Time</div><div class="bd">78% of customers buy from the first business to reply. Your AI responds before anyone else reads the message.</div><div class="bsv">0.3s</div><div class="bsl">Average response time</div></div>
+    <div class="bc sr"><div class="bi">📞</div><div class="bt">AI Phone Agent</div><div class="bd">Sounds 100% human. Answers every call, qualifies leads, books appointments 24/7.</div></div>
+    <div class="bc bcblue sr"><div class="bi">🗓️</div><div class="bt">Auto Booking</div><div class="bd">AI books directly into your calendar. No back and forth. Never missed.</div><div class="bsv">50K+</div><div class="bsl">Appointments booked</div></div>
+    <div class="bc sr"><div class="bi">💬</div><div class="bt">Unified Inbox</div><div class="bd">SMS, email, Facebook, Instagram, WhatsApp — all in one place, handled by AI.</div></div>
+    <div class="bc sr"><div class="bi">👥</div><div class="bt">Smart CRM</div><div class="bd">Every lead automatically scored, tagged and moved through your pipeline.</div></div>
+    <div class="bc bcdark sr"><div class="bi">🌍</div><div class="bt">Works 24/7/365</div><div class="bd">Nights, weekends, holidays. Never sleeps, never calls in sick.</div><div class="bsv">200+</div><div class="bsl">Businesses automated</div></div>
+  </div>
+</div>
+<div class="sec secc sr">
+  <div class="eye">Results</div><h2 class="h2 disp">Real businesses.<br>Real results.</h2>
+  <div class="testis">
+    <div class="tc"><div class="tst">★★★★★</div><div class="tq">"Within the first week our AI was booking 3-4 appointments daily without us doing anything. Absolutely incredible."</div><div class="tn">James R.</div><div class="tr">Real Estate Agency, Toronto</div></div>
+    <div class="tc"><div class="tst">★★★★★</div><div class="tq">"We went from missing 60% of calls to every single one answered perfectly. Paid for itself in week one."</div><div class="tn">Sarah M.</div><div class="tr">Medical Clinic, Vancouver</div></div>
+    <div class="tc"><div class="tst">★★★★★</div><div class="tq">"Our DMs used to pile up for days. Now every lead gets an instant reply and conversions tripled in 30 days."</div><div class="tn">Mike T.</div><div class="tr">eCommerce Brand, Calgary</div></div>
+    <div class="tc"><div class="tst">★★★★★</div><div class="tq">"The CRM integration saved us 40 hours a week. Every call logged, every lead tracked. Incredible."</div><div class="tn">Diana K.</div><div class="tr">Law Firm, Montreal</div></div>
+    <div class="tc"><div class="tst">★★★★★</div><div class="tq">"Setup done in 5 days and by day 7 we had 12 new appointments booked automatically. ROI was immediate."</div><div class="tn">Carlos B.</div><div class="tr">Dental Practice, Ottawa</div></div>
+  </div>
+</div>
+<div class="sec secc sr" id="pricing">
+  <div class="eye">Pricing</div><h2 class="h2 disp">Simple pricing.<br>Powerful results.</h2>
+  <p class="sub">Every plan includes full setup. We work until it works.</p>
+  <div class="pricing">
+    <div class="prc sr"><div class="pn">AI Starter</div><div class="pd">For businesses ready to automate messaging</div><div class="ps">CA$799 one-time setup</div><div class="pp">CA$499</div><div class="pper">per month</div><div class="pfs"><div class="pf">AI replies to all DMs instantly</div><div class="pf">WhatsApp, Facebook, Instagram</div><div class="pf">SMS &amp; website chat</div><div class="pf">Unified smart inbox</div><div class="pf">24/7 AI responses</div></div><a href="https://phenex.ai/payment?plan=starter" class="pbtn pbout">Get Started →</a></div>
+    <div class="prc prcp sr"><div class="ptag">Most Popular</div><div class="pn">AI Growth</div><div class="pd">Everything + CRM, pipeline &amp; booking</div><div class="ps">CA$1,499 one-time setup</div><div class="pp">CA$999</div><div class="pper">per month</div><div class="pfs"><div class="pf">Everything in Starter ✓</div><div class="pf">Appointment auto-booking</div><div class="pf">Full CRM &amp; pipeline</div><div class="pf">Lead nurturing sequences</div><div class="pf">Weekly performance reports</div></div><a href="https://phenex.ai/payment?plan=growth" class="pbtn pbw">Best Value →</a></div>
+    <div class="prc sr"><div class="pn">AI Receptionist</div><div class="pd">Complete AI phone employee</div><div class="ps">CA$1,999 one-time setup</div><div class="pp">CA$1,499</div><div class="pper">per month</div><div class="pfs"><div class="pf">Everything in Growth ✓</div><div class="pf">AI answers ALL calls</div><div class="pf">Sounds 100% human</div><div class="pf">Up to 5 phone numbers</div><div class="pf">Call recordings &amp; summaries</div></div><a href="https://phenex.ai/payment?plan=elite" class="pbtn pbout">Get Elite →</a></div>
+  </div>
+</div>
+<div class="cta sr">
+  <div style="position:relative;z-index:1">
+    <div class="eye" style="color:rgba(255,255,255,.55)">Ready?</div>
+    <h2 class="ctah disp">Your AI employee<br>is ready to start.</h2>
+    <p class="ctas">Setup in 7 days. No tech skills. We work until it works.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a href="https://phenex.ai/#plans" class="btn bw blg">Get Started — CA$499 →</a>
+      <a href="https://phenex.ai/#demo" class="btn bwg blg">Book Free Demo</a>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.4)">✓ Setup in 7 days &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ We work until it works</div>
+  </div>
+</div>
+<footer>
+  <div><div class="fl">phenexAi</div><div style="font-size:11px;color:var(--ink4);margin-top:4px">© 2026 PhenexAi. All rights reserved.</div></div>
+  <div class="flinks"><a href="#products">Products</a><a href="#pricing">Pricing</a><a href="https://phenex.ai/terms--conditions--phenex-ai-page">Terms</a><a href="login.html">Login</a></div>
+  <div class="fc">Powered by <span class="mg">Midnight Glimmers</span></div>
+</footer>
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')});},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.sr').forEach(el=>obs.observe(el));
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const id=a.getAttribute('href').slice(1);const el=document.getElementById(id);if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth'});}});});
+</script>
 </body>
 </html>

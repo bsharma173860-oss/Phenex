@@ -5,160 +5,223 @@
 <title>PhenexAi — Dashboard</title>
 <link rel="stylesheet" href="css/phenex.css">
 <style>
-.activity-item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);}
-.activity-item:last-child{border-bottom:none;}
-.act-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.act-title{font-size:13.5px;color:var(--ink);font-weight:500;}
-.act-time{font-size:11px;color:var(--ink4);margin-top:2px;}
-.deal-col-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
-.deal-mini{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:all .15s;}
-.deal-mini:hover{border-color:var(--border2);background:var(--alight);}
-.deal-mini-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
-.deal-mini-val{font-size:12px;color:var(--success);font-weight:600;}
-.chat-wrap{display:flex;flex-direction:column;gap:8px;max-height:190px;overflow-y:auto;margin-bottom:12px;}
-.bubble{display:flex;gap:8px;align-items:flex-start;}
-.bubble.user{flex-direction:row-reverse;}
-.bubble-txt{padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;max-width:82%;}
-.bubble.ai .bubble-txt{background:var(--alight);color:var(--ink);border-radius:4px 12px 12px 12px;}
-.bubble.user .bubble-txt{background:var(--accent);color:#fff;border-radius:12px 4px 12px 12px;}
-.chat-input-row{display:flex;gap:8px;}
-.chat-inp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:100px;padding:9px 14px;color:var(--ink);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
-.chat-inp:focus{border-color:var(--accent);}
-.chat-inp::placeholder{color:var(--ink4);}
-.send-btn{background:var(--accent);border:none;border-radius:100px;padding:9px 16px;cursor:pointer;color:#fff;font-size:13px;font-weight:500;}
-.send-btn:hover{opacity:.85;}
+.pipeline-cols { display:flex; gap:10px; }
+.pipeline-col { flex:1; }
+.pipeline-stage-lbl { font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center; }
+.pipeline-stage-lbl .cnt { background:var(--glass-border);padding:2px 7px;border-radius:10px;color:var(--text-dim); }
+.deal-card { background:var(--glass2);border:1px solid var(--glass-border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all 0.2s; }
+.deal-card:hover { border-color:var(--glass-border2);transform:translateX(2px); }
+.deal-name { font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px; }
+.deal-val { font-size:12px;color:var(--success);font-weight:700; }
+.deal-co { font-size:11px;color:var(--text-muted); }
+.activity-item { display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.03); }
+.activity-item:last-child { border-bottom:none; }
+.act-icon { width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0; }
+.act-title { font-size:13px;color:var(--text);font-weight:500; }
+.act-time { font-size:11px;color:var(--text-muted);margin-top:2px; }
+.chat-wrap { display:flex;flex-direction:column;gap:10px;max-height:200px;overflow-y:auto;margin-bottom:14px; }
+.bubble { display:flex;gap:8px;align-items:flex-start; }
+.bubble.user { flex-direction:row-reverse; }
+.bubble-av { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright)); }
+.bubble-av.u { background:rgba(155,109,255,0.2);color:var(--purple); font-size:14px; }
+.bubble-txt { padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.5;max-width:82%; }
+.bubble.ai .bubble-txt { background:rgba(74,85,224,0.12);border:1px solid var(--glass-border);border-radius:4px 12px 12px 12px; }
+.bubble.user .bubble-txt { background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));color:#fff;border-radius:12px 4px 12px 12px; }
+.chat-input-row { display:flex;gap:10px; }
+.chat-input { flex:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color 0.2s; }
+.chat-input:focus { border-color:var(--blue-accent); }
+.chat-input::placeholder { color:var(--text-muted); }
+.send-btn { background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));border:none;border-radius:10px;padding:10px 16px;cursor:pointer;color:#fff;font-size:14px;transition:opacity 0.2s; }
+.send-btn:hover { opacity:0.85; }
 </style>
 </head>
 <body>
+<div class="bg-mesh"></div>
 <div class="app-layout">
   <div id="sidebarMount"></div>
   <div class="main-content">
     <div id="topbarMount"></div>
     <div class="page-content">
 
-      <div class="grid-4 mb-24 anim-up">
-        <div class="stat-card d1">
-          <div class="stat-change up">↑ 18%</div>
-          <div class="stat-icon accent-green">💰</div>
+      <!-- STATS -->
+      <div class="grid-4 mb-24">
+        <div class="stat-card anim-up d1">
+          <div class="stat-glow" style="background:rgba(34,211,160,0.2)"></div>
+          <div class="stat-change up">↑ 18.2%</div>
+          <div class="stat-icon">💰</div>
           <div class="stat-value">$84.3K</div>
           <div class="stat-label">Revenue This Month</div>
           <div class="mini-bars">
-            <div class="mini-bar" style="height:30%"></div><div class="mini-bar" style="height:50%"></div>
-            <div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:70%"></div>
-            <div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:85%"></div>
-            <div class="mini-bar last" style="height:100%"></div>
+            <div class="mini-bar" style="height:30%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar" style="height:50%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar" style="height:40%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar" style="height:70%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar" style="height:60%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar" style="height:85%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
+            <div class="mini-bar last" style="height:100%;background:linear-gradient(180deg,var(--success),#1aab80)"></div>
           </div>
         </div>
-        <div class="stat-card d2">
-          <div class="stat-change up">↑ 12%</div>
-          <div class="stat-icon accent-blue">👥</div>
+        <div class="stat-card anim-up d2">
+          <div class="stat-glow" style="background:var(--blue-glow)"></div>
+          <div class="stat-change up">↑ 12.5%</div>
+          <div class="stat-icon">👥</div>
           <div class="stat-value">1,284</div>
           <div class="stat-label">Total Contacts</div>
           <div class="mini-bars">
-            <div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:55%"></div>
-            <div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:70%"></div>
-            <div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:82%"></div>
+            <div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:60%"></div>
+            <div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:75%"></div>
+            <div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:88%"></div>
             <div class="mini-bar last" style="height:100%"></div>
           </div>
         </div>
-        <div class="stat-card d3">
-          <div class="stat-change up">↑ 5%</div>
-          <div class="stat-icon accent-orange">📅</div>
+        <div class="stat-card anim-up d3">
+          <div class="stat-glow" style="background:rgba(255,181,71,0.15)"></div>
+          <div class="stat-change up">↑ 5.8%</div>
+          <div class="stat-icon">📅</div>
           <div class="stat-value">47</div>
           <div class="stat-label">Appointments This Week</div>
           <div class="mini-bars">
-            <div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:80%"></div>
-            <div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:90%"></div>
-            <div class="mini-bar" style="height:70%"></div><div class="mini-bar last" style="height:100%"></div>
-            <div class="mini-bar" style="height:75%"></div>
+            <div class="mini-bar" style="height:60%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar" style="height:80%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar" style="height:55%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar" style="height:90%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar" style="height:70%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar last" style="height:100%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
+            <div class="mini-bar" style="height:75%;background:linear-gradient(180deg,var(--warning),#c88a1e)"></div>
           </div>
         </div>
-        <div class="stat-card d4">
-          <div class="stat-change down">↓ 2%</div>
-          <div class="stat-icon accent-red">🔥</div>
+        <div class="stat-card anim-up d4">
+          <div class="stat-glow" style="background:rgba(255,91,127,0.12)"></div>
+          <div class="stat-change down">↓ 2.1%</div>
+          <div class="stat-icon">🔥</div>
           <div class="stat-value">23</div>
           <div class="stat-label">Open Deals</div>
           <div class="mini-bars">
-            <div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:60%"></div>
-            <div class="mini-bar" style="height:75%"></div><div class="mini-bar" style="height:50%"></div>
-            <div class="mini-bar" style="height:65%"></div><div class="mini-bar last" style="height:55%"></div>
-            <div class="mini-bar" style="height:70%"></div>
+            <div class="mini-bar" style="height:80%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar" style="height:60%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar" style="height:75%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar" style="height:50%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar" style="height:65%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar last" style="height:55%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
+            <div class="mini-bar" style="height:70%;background:linear-gradient(180deg,var(--danger),#c43060)"></div>
           </div>
         </div>
       </div>
 
-      <div class="grid-2-1 mb-24 anim-up d2">
-        <div class="card">
+      <!-- ROW 2 -->
+      <div class="grid-2-1 mb-24">
+        <!-- CRM table -->
+        <div class="glass-card anim-up d3">
           <div class="card-header">
-            <div class="card-title">Recent Leads</div>
-            <a href="crm.html" class="card-action">View All →</a>
+            <div class="card-title">🔥 Recent Leads</div>
+            <a href="crm.html" class="card-action">View All CRM →</a>
           </div>
           <table class="data-table">
             <thead><tr><th>Contact</th><th>Source</th><th>Status</th><th>Value</th></tr></thead>
             <tbody>
-              <tr onclick="location='crm.html'"><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:#4F46E5">SM</div><div><div style="font-weight:600;color:var(--ink)">Sarah Mitchell</div><div style="font-size:11px;color:var(--ink4)">TechCorp Inc.</div></div></div></td><td>LinkedIn</td><td><span class="pill pill-hot">Hot</span></td><td style="font-weight:600;color:var(--success)">$12,000</td></tr>
-              <tr onclick="location='crm.html'"><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:#F59E0B">AK</div><div><div style="font-weight:600;color:var(--ink)">Ahmed Khan</div><div style="font-size:11px;color:var(--ink4)">Nova Agency</div></div></div></td><td>Website</td><td><span class="pill pill-warm">Warm</span></td><td style="font-weight:600;color:var(--success)">$8,500</td></tr>
-              <tr onclick="location='crm.html'"><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:#10B981">LR</div><div><div style="font-weight:600;color:var(--ink)">Lisa Rodriguez</div><div style="font-size:11px;color:var(--ink4)">Bloom Studio</div></div></div></td><td>Referral</td><td><span class="pill pill-closed">Closed</span></td><td style="font-weight:600;color:var(--success)">$21,000</td></tr>
-              <tr onclick="location='crm.html'"><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:#EF4444">JT</div><div><div style="font-weight:600;color:var(--ink)">Julia Thompson</div><div style="font-size:11px;color:var(--ink4)">Apex Group</div></div></div></td><td>Instagram</td><td><span class="pill pill-hot">Hot</span></td><td style="font-weight:600;color:var(--success)">$15,800</td></tr>
-              <tr onclick="location='crm.html'"><td><div style="display:flex;align-items:center;gap:10px"><div class="avatar avatar-sm" style="background:#8B5CF6">DC</div><div><div style="font-weight:600;color:var(--ink)">David Chen</div><div style="font-size:11px;color:var(--ink4)">SolarWave</div></div></div></td><td>Cold Email</td><td><span class="pill pill-warm">Warm</span></td><td style="font-weight:600;color:var(--success)">$9,400</td></tr>
+              <tr onclick="location='crm.html'"><td><span class="avatar avatar-sm" style="background:linear-gradient(135deg,#4a55e0,#6272ff);display:inline-flex;margin-right:10px;vertical-align:middle">SM</span><strong>Sarah Mitchell</strong></td><td>LinkedIn</td><td><span class="pill pill-hot">Hot</span></td><td style="color:var(--success);font-weight:700">$12,000</td></tr>
+              <tr onclick="location='crm.html'"><td><span class="avatar avatar-sm" style="background:linear-gradient(135deg,#f5a623,#c88a1e);display:inline-flex;margin-right:10px;vertical-align:middle">AK</span><strong>Ahmed Khan</strong></td><td>Website</td><td><span class="pill pill-warm">Warm</span></td><td style="color:var(--success);font-weight:700">$8,500</td></tr>
+              <tr onclick="location='crm.html'"><td><span class="avatar avatar-sm" style="background:linear-gradient(135deg,#22d3a0,#1aab80);display:inline-flex;margin-right:10px;vertical-align:middle">LR</span><strong>Lisa Rodriguez</strong></td><td>Referral</td><td><span class="pill pill-closed">Closed</span></td><td style="color:var(--success);font-weight:700">$21,000</td></tr>
+              <tr onclick="location='crm.html'"><td><span class="avatar avatar-sm" style="background:linear-gradient(135deg,#6272ff,#4a55e0);display:inline-flex;margin-right:10px;vertical-align:middle">MP</span><strong>Marcus Patel</strong></td><td>Facebook</td><td><span class="pill pill-cold">Cold</span></td><td style="color:var(--success);font-weight:700">$5,200</td></tr>
+              <tr onclick="location='crm.html'"><td><span class="avatar avatar-sm" style="background:linear-gradient(135deg,#ff5b7f,#c43060);display:inline-flex;margin-right:10px;vertical-align:middle">JT</span><strong>Julia Thompson</strong></td><td>Instagram</td><td><span class="pill pill-hot">Hot</span></td><td style="color:var(--success);font-weight:700">$15,800</td></tr>
             </tbody>
           </table>
         </div>
 
-        <div class="card">
+        <!-- Pipeline mini -->
+        <div class="glass-card anim-up d4">
           <div class="card-header">
-            <div class="card-title">Pipeline</div>
+            <div class="card-title">📊 Pipeline</div>
             <a href="pipeline.html" class="card-action">Full →</a>
           </div>
-          <div>
-            <div class="deal-col-lbl">Lead <span style="background:var(--alight);color:var(--accent);padding:1px 7px;border-radius:10px;font-size:10px">4</span></div>
-            <div class="deal-mini"><div class="deal-mini-name">TechCorp Inc.</div><div class="deal-mini-val">$18,000</div></div>
-            <div class="deal-mini"><div class="deal-mini-name">Nova Agency</div><div class="deal-mini-val">$7,200</div></div>
-            <div class="divider"></div>
-            <div class="deal-col-lbl">Proposal <span style="background:var(--warning-light);color:var(--warning);padding:1px 7px;border-radius:10px;font-size:10px">2</span></div>
-            <div class="deal-mini"><div class="deal-mini-name">Bloom Studio</div><div class="deal-mini-val">$24,500</div></div>
-            <div class="divider"></div>
-            <div class="deal-col-lbl">Won <span style="background:var(--success-light);color:var(--success);padding:1px 7px;border-radius:10px;font-size:10px">2</span></div>
-            <div class="deal-mini" style="border-color:rgba(16,185,129,.2);background:var(--success-light)"><div class="deal-mini-name">Apex Group</div><div class="deal-mini-val">$33,000 ✓</div></div>
+          <div class="pipeline-cols">
+            <div class="pipeline-col">
+              <div class="pipeline-stage-lbl">Lead <span class="cnt">4</span></div>
+              <div class="deal-card"><div class="deal-name">TechCorp</div><div class="deal-val">$18K</div></div>
+              <div class="deal-card"><div class="deal-name">Nova Agency</div><div class="deal-val">$7.2K</div></div>
+            </div>
+            <div class="pipeline-col">
+              <div class="pipeline-stage-lbl">Proposal <span class="cnt">3</span></div>
+              <div class="deal-card"><div class="deal-name">Bloom Studio</div><div class="deal-val">$24.5K</div></div>
+            </div>
+            <div class="pipeline-col">
+              <div class="pipeline-stage-lbl">Won <span class="cnt">2</span></div>
+              <div class="deal-card" style="border-color:rgba(34,211,160,0.2)"><div class="deal-name">Apex Group</div><div class="deal-val">$33K ✓</div></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="grid-3 anim-up d3">
-        <div class="card">
+      <!-- ROW 3 -->
+      <div class="grid-3">
+        <!-- AI Chat -->
+        <div class="glass-card anim-up d4">
           <div class="card-header">
-            <div class="card-title">AI Agent</div>
-            <span style="font-size:11px;color:var(--success);font-weight:600;background:var(--success-light);padding:3px 8px;border-radius:20px;">● Live</span>
+            <div class="card-title">🤖 AI Agent</div>
+            <span style="font-size:11px;color:var(--success);font-weight:700">● Live</span>
           </div>
           <div class="chat-wrap" id="chatMsgs">
-            <div class="bubble ai"><div class="avatar avatar-sm accent-blue" style="font-size:14px">🤖</div><div class="bubble-txt">Hi! I'm your PhenexAi agent. What do you need?</div></div>
-            <div class="bubble user"><div class="avatar avatar-sm">JD</div><div class="bubble-txt">Flag stale deals over 14 days</div></div>
-            <div class="bubble ai"><div class="avatar avatar-sm accent-blue" style="font-size:14px">🤖</div><div class="bubble-txt">Found 3 stale deals. Want me to send follow-ups? ✅</div></div>
+            <div class="bubble ai"><div class="bubble-av">🤖</div><div class="bubble-txt">Hi! I'm your PhenexAi agent. What do you need?</div></div>
+            <div class="bubble user"><div class="bubble-av u">👤</div><div class="bubble-txt">Flag stale deals over 14 days</div></div>
+            <div class="bubble ai"><div class="bubble-av">🤖</div><div class="bubble-txt">Found 3 stale deals. Want me to send follow-ups?</div></div>
           </div>
           <div class="chat-input-row">
-            <input class="chat-inp" id="chatInput" placeholder="Ask your AI agent…" onkeydown="if(event.key==='Enter')sendMsg()">
-            <button class="send-btn" onclick="sendMsg()">→</button>
+            <input class="chat-input" id="chatInput" placeholder="Ask your AI agent…" onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="send-btn" onclick="sendMsg()">➤</button>
           </div>
         </div>
 
-        <div class="card">
+        <!-- Today's schedule -->
+        <div class="glass-card anim-up d5">
           <div class="card-header">
-            <div class="card-title">Today</div>
+            <div class="card-title">📅 Today</div>
             <a href="calendar.html" class="card-action">Calendar →</a>
           </div>
-          <div class="activity-item"><div class="act-icon accent-blue">📞</div><div><div class="act-title">Discovery — TechCorp Inc.</div><div class="act-time">9:00 AM · 45 min · Video</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-green">🤝</div><div><div class="act-title">Onboarding — Apex Group</div><div class="act-time">2:30 PM · 60 min · In Person</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-orange">✍️</div><div><div class="act-title">Proposal Review — FintechX</div><div class="act-time">4:00 PM · 30 min · Call</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-purple">🤖</div><div><div class="act-title">AI Follow-ups scheduled</div><div class="act-time">6:00 PM · Auto · 3 contacts</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div class="activity-item">
+              <div class="act-icon" style="background:rgba(74,85,224,0.12)">📞</div>
+              <div><div class="act-title">Discovery — TechCorp Inc.</div><div class="act-time">9:00 AM · 45 min · Video</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="act-icon" style="background:rgba(34,211,160,0.12)">🤝</div>
+              <div><div class="act-title">Onboarding — Apex Group</div><div class="act-time">2:30 PM · 60 min · In Person</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="act-icon" style="background:rgba(255,181,71,0.12)">✍️</div>
+              <div><div class="act-title">Proposal Review — FintechX</div><div class="act-time">4:00 PM · 30 min · Call</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="act-icon" style="background:rgba(155,109,255,0.12)">🤖</div>
+              <div><div class="act-title">AI Follow-ups scheduled</div><div class="act-time">6:00 PM · Auto · 3 contacts</div></div>
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header"><div class="card-title">Activity</div></div>
-          <div class="activity-item"><div class="act-icon accent-green">💳</div><div><div class="act-title">Payment received — $33,000</div><div class="act-time">2 min ago</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-blue">🤖</div><div><div class="act-title">AI booked appt with Julia T.</div><div class="act-time">18 min ago</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-orange">📧</div><div><div class="act-title">Follow-ups sent to 3 deals</div><div class="act-time">1 hr ago</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-red">📞</div><div><div class="act-title">AI handled inbound call</div><div class="act-time">3 hr ago</div></div></div>
-          <div class="activity-item"><div class="act-icon accent-green">🏢</div><div><div class="act-title">Sub-account created in 1m 47s</div><div class="act-time">Yesterday</div></div></div>
+        <!-- Activity feed -->
+        <div class="glass-card anim-up d6">
+          <div class="card-header">
+            <div class="card-title">⚡ Activity</div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(34,211,160,0.12)">💳</div>
+            <div><div class="act-title">Payment received — $33,000</div><div class="act-time">2 min ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(74,85,224,0.12)">🤖</div>
+            <div><div class="act-title">AI booked appt with Julia T.</div><div class="act-time">18 min ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(255,181,71,0.12)">📧</div>
+            <div><div class="act-title">Follow-ups sent to 3 deals</div><div class="act-time">1 hr ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(255,91,127,0.12)">📞</div>
+            <div><div class="act-title">AI handled inbound call</div><div class="act-time">3 hr ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon" style="background:rgba(34,211,160,0.12)">🏢</div>
+            <div><div class="act-title">Sub-account created in 1m 47s</div><div class="act-time">Yesterday</div></div>
+          </div>
         </div>
       </div>
 
@@ -166,19 +229,20 @@
   </div>
 </div>
 <script src="js/phenex.js"></script>
-<script src="js/api.js"></script>
 <script>
 document.getElementById('sidebarMount').outerHTML = buildSidebar('index.html');
-document.getElementById('topbarMount').outerHTML = buildTopbar('Good morning, John 👋','Friday, March 21, 2026 · Dashboard');
-const replies=['Done! Sending follow-up emails ✅','CRM updated and reminder set ✅','Booked! Calendar invite sent ✅','Invoice sent via Stripe ✅','Found 5 new leads from your website!'];
-function sendMsg(){
-  const inp=document.getElementById('chatInput');
-  const msgs=document.getElementById('chatMsgs');
-  const txt=inp.value.trim();if(!txt)return;
-  msgs.innerHTML+=`<div class="bubble user"><div class="avatar avatar-sm">JD</div><div class="bubble-txt">${txt}</div></div>`;
-  inp.value='';msgs.scrollTop=9999;
-  setTimeout(()=>{msgs.innerHTML+=`<div class="bubble ai"><div class="avatar avatar-sm accent-blue" style="font-size:14px">🤖</div><div class="bubble-txt">${replies[Math.floor(Math.random()*replies.length)]}</div></div>`;msgs.scrollTop=9999;},800);
+document.getElementById('topbarMount').outerHTML = buildTopbar('Good morning, John 👋', 'Tuesday, March 17, 2026 — PhenexAi Dashboard');
+const replies = ['Got it! Sending follow-up emails now. ✅','Done! CRM updated and reminder set.','Booked! Calendar invite sent automatically.','Invoice sent via Stripe. ✅','Found 5 new leads from your website this week!','Call handled — added as Hot lead in CRM. 🔥'];
+function sendMsg() {
+  const inp = document.getElementById('chatInput');
+  const msgs = document.getElementById('chatMsgs');
+  const txt = inp.value.trim(); if(!txt) return;
+  msgs.innerHTML += `<div class="bubble user"><div class="bubble-av u">👤</div><div class="bubble-txt">${txt}</div></div>`;
+  inp.value = ''; msgs.scrollTop = 9999;
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="bubble ai"><div class="bubble-av">🤖</div><div class="bubble-txt">${replies[Math.floor(Math.random()*replies.length)]}</div></div>`;
+    msgs.scrollTop = 9999;
+  }, 900);
 }
 </script>
-</body>
-</html>
+</body></html>
